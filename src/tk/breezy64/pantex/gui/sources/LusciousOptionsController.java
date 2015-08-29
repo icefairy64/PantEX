@@ -18,6 +18,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import tk.breezy64.pantex.gui.SourceBrowserController;
 
 /**
  * FXML Controller class
@@ -41,7 +42,7 @@ public class LusciousOptionsController implements Initializable {
 
     @FXML
     private void okClick(ActionEvent event) throws Exception {
-        Scene browserScene = new Scene(FXMLLoader.load(getClass().getResource("/cirnarium/pantex/gui/SourceBrowser.fxml")));
+        Scene browserScene = new Scene(FXMLLoader.load(SourceBrowserController.class.getResource("SourceBrowser.fxml")));
         browserScene.setUserData(new LusciousSource(categoryField.getSelectionModel().getSelectedItem().name));
         
         Stage browser = new Stage();

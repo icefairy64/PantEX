@@ -12,6 +12,8 @@ import tk.breezy64.pantex.core.sources.ImageSource;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -30,6 +32,10 @@ import javafx.scene.shape.Rectangle;
  * @author icefairy64
  */
 public class SourceBrowserController implements Initializable {
+    
+    private ImageSource src;
+    private IntegerProperty thumbSize;
+    
     @FXML
     private FlowPane flowPane;
     @FXML
@@ -41,8 +47,6 @@ public class SourceBrowserController implements Initializable {
     @FXML
     private ComboBox<Collection> collectionSelector;
     
-    private ImageSource src;
-    
     /**
      * Initializes the controller class.
      */
@@ -53,6 +57,8 @@ public class SourceBrowserController implements Initializable {
         shadeRect.heightProperty().bind(scrollPane.heightProperty());
         collectionSelector.getItems().addAll(Collection.dictionary.values());
         collectionSelector.getSelectionModel().select(Collection.dictionary.get(0));
+        
+        thumbSize = new SimpleIntegerProperty(100);
     }    
 
     @FXML
@@ -98,8 +104,8 @@ public class SourceBrowserController implements Initializable {
     private void fetchImage(EXImage img) {
         ImageView view = new ImageView(new Image(Util.fetchStream(img.thumbURL)));
         view.setPreserveRatio(true);
-        view.setFitWidth(100);
-        view.setFitHeight(100);
+        view.fitWidthProperty().bind(thumbSize);
+        view.fitHeightProperty().bind(thumbSize);
         view.setUserData(img);
             
         view.setOnMouseClicked((e) -> {

@@ -25,10 +25,17 @@ public class DanbooruSource extends ImageSource {
     private static final Pattern imgPattern = Pattern.compile("data-file-url=\"(.*)\"");
     private static final Pattern thumbPattern = Pattern.compile("data-preview-file-url=\"(.*)\"");
     
+    private final String url;
+    
+    public DanbooruSource() {
+        super();
+        url = simpleURL;
+    }
+    
     @Override
     protected void load(int page) {
-        String url = String.format(simpleURL, page + 1);
-        String content = Util.fetch(url);
+        String lurl = String.format(simpleURL, page + 1);
+        String content = Util.fetch(lurl);
         Matcher m = imgPattern.matcher(content);
         Matcher t = thumbPattern.matcher(content);
         
