@@ -20,10 +20,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Slider;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
 
 /**
@@ -46,6 +49,14 @@ public class SourceBrowserController implements Initializable {
     private Rectangle shadeRect;
     @FXML
     private ComboBox<Collection> collectionSelector;
+    @FXML
+    private HBox rightHBox;
+    @FXML
+    private Slider thumbSizeSlider;
+    @FXML
+    private AnchorPane bottomPanel;
+    @FXML
+    private HBox leftHBox;
     
     /**
      * Initializes the controller class.
@@ -57,8 +68,10 @@ public class SourceBrowserController implements Initializable {
         shadeRect.heightProperty().bind(scrollPane.heightProperty());
         collectionSelector.getItems().addAll(Collection.dictionary.values());
         collectionSelector.getSelectionModel().select(Collection.dictionary.get(0));
+        rightHBox.prefWidthProperty().bind(bottomPanel.widthProperty().subtract(leftHBox.widthProperty()));
         
         thumbSize = new SimpleIntegerProperty(100);
+        thumbSize.bind(thumbSizeSlider.valueProperty());
     }    
 
     @FXML

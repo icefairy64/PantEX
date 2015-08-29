@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -28,6 +29,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -153,6 +155,7 @@ public class MainController implements Initializable {
     private void fetchDanbooru(ActionEvent event) {
         indicateProgressStart();
         Static.executor.submit(() -> onFetch(danbooru.next()));
+        event.consume();
     }
     
     private void onFetch(EXImage[] imgs) {
@@ -174,6 +177,8 @@ public class MainController implements Initializable {
         browser.setTitle("Danbooru browser");
         browser.setScene(browserScene);
         browser.show();
+        
+        event.consume();
     }
 
     @FXML
@@ -183,6 +188,30 @@ public class MainController implements Initializable {
         browser.setTitle("Luscious");
         browser.setScene(browserScene);
         browser.show();
+        event.consume();
+    }
+
+    @FXML
+    private void browseDanbooruSearch(ActionEvent event) throws Exception {
+        Scene browserScene = new Scene(FXMLLoader.load(getClass().getResource("SourceBrowser.fxml")));
+        
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Danbooru [search]");
+        dialog.setHeaderText("Danbooru");
+        dialog.setContentText("Tags:");
+        Optional<String> result = dialog.showAndWait();
+        if (!result.isPresent()) {
+            return;
+        }
+        
+        browserScene.setUserData(new DanbooruSource(result.get()));
+        
+        Stage browser = new Stage();
+        browser.setTitle("Danbooru browser");
+        browser.setScene(browserScene);
+        browser.show();
+        
+        event.consume();
     }
     
 }

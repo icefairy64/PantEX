@@ -12,7 +12,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 /**
@@ -69,10 +71,10 @@ public final class Util {
 
     public static InputStream fetchStream(String url) {
         try {
-            HttpClient hc = HttpClients.createDefault();
+            CloseableHttpClient hc = HttpClients.createDefault();
             HttpGet hr = new HttpGet(url);
             hr.addHeader("User-Agent", Util.userAgent);
-            HttpResponse resp = hc.execute(hr);
+            CloseableHttpResponse resp = hc.execute(hr);
             InputStream in = resp.getEntity().getContent();
             return in;
         } catch (Throwable e) {

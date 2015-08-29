@@ -25,6 +25,7 @@
                     <items>
                       <MenuItem mnemonicParsing="false" onAction="#fetchDanbooru" text="Add" />
                         <MenuItem mnemonicParsing="false" onAction="#browseDanbooru" text="Browse..." />
+                        <MenuItem mnemonicParsing="false" onAction="#browseDanbooruSearch" text="Search..." />
                     </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Luscious">

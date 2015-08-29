@@ -25,18 +25,20 @@
             <ProgressIndicator fx:id="progressIndicator" maxHeight="64.0" maxWidth="64.0" visible="false" />
          </children>
       </StackPane>
-      <AnchorPane>
+      <AnchorPane fx:id="bottomPanel">
          <children>
-            <HBox alignment="CENTER_LEFT" layoutX="0.0380859375" prefHeight="30.0" spacing="8.0" AnchorPane.leftAnchor="0.0">
+            <HBox fx:id="leftHBox" alignment="CENTER_LEFT" layoutX="0.0380859375" prefHeight="30.0" spacing="8.0" AnchorPane.leftAnchor="0.0">
                <children>
                   <Label prefHeight="15.0" text="Target collection:" />
                   <ComboBox fx:id="collectionSelector" prefWidth="150.0" promptText="Select..." />
                </children>
             </HBox>
-            <HBox alignment="CENTER_RIGHT" layoutX="196.0" layoutY="-1.0" prefHeight="30.0" prefWidth="231.0" spacing="8.0" AnchorPane.rightAnchor="0.0">
+            <HBox fx:id="rightHBox" alignment="CENTER_RIGHT" layoutX="196.0" layoutY="-1.0" prefHeight="30.0" spacing="8.0" AnchorPane.rightAnchor="0.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#fetchClick" text="Fetch more" />
-                  <Button mnemonicParsing="false" onAction="#closeClick" text="Close" />
+                  <Label minWidth="-Infinity" text="Thumb size" />
+                  <Slider fx:id="thumbSizeSlider" max="250.0" min="50.0" value="100.0" />
+                  <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#fetchClick" text="Fetch more" />
+                  <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#closeClick" text="Close" />
                </children>
             </HBox>
          </children>

@@ -5,6 +5,9 @@
  */
 package tk.breezy64.pantex.core.sources;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.RemoteImage;
 import tk.breezy64.pantex.core.Util;
@@ -12,6 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.http.client.utils.URIUtils;
+import sun.net.util.URLUtil;
 
 /**
  *
@@ -21,6 +26,7 @@ public class DanbooruSource extends ImageSource {
     
     private static final String root = "http://danbooru.donmai.us";
     private static final String simpleURL = "http://danbooru.donmai.us/posts?page=%d";
+    private static final String searchURL = "http://danbooru.donmai.us/posts?tags=%s&page=%d";
     
     private static final Pattern imgPattern = Pattern.compile("data-file-url=\"(.*)\"");
     private static final Pattern thumbPattern = Pattern.compile("data-preview-file-url=\"(.*)\"");
@@ -32,9 +38,19 @@ public class DanbooruSource extends ImageSource {
         url = simpleURL;
     }
     
+    public DanbooruSource(String query) {
+        super();
+        try {
+            url = searchURL.replace("%s", URLEncoder.encode(query, "UTF-8"));
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     @Override
     protected void load(int page) {
-        String lurl = String.format(simpleURL, page + 1);
+        String lurl = String.format(url, page + 1);
         String content = Util.fetch(lurl);
         Matcher m = imgPattern.matcher(content);
         Matcher t = thumbPattern.matcher(content);
