@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="414.0" prefWidth="512.0" spacing="8.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cirnarium.pantex.gui.CollectionsController">
+   <padding>
+      <Insets bottom="14.0" left="14.0" right="14.0" top="14.0" />
+   </padding>
+   <children>
+      <SplitPane dividerPositions="0.5" VBox.vgrow="SOMETIMES">
+         <items>
+            <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0" HBox.hgrow="SOMETIMES">
+               <children>
+                  <Label text="Collections:" />
+                  <ListView fx:id="collectionsList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES" />
+               </children>
+            </VBox>
+            <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0" HBox.hgrow="SOMETIMES">
+               <children>
+                  <Label text="Images:" />
+                  <ListView fx:id="imagesList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES" />
+               </children>
+            </VBox>
+         </items>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </SplitPane>
+      <HBox alignment="CENTER_RIGHT" prefHeight="37.0" prefWidth="541.0" spacing="8.0">
+         <children>
+            <ProgressIndicator fx:id="progressIndicator" visible="false">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets bottom="4.0" top="4.0" />
+               </HBox.margin>
+            </ProgressIndicator>
+            <Button mnemonicParsing="false" onAction="#importClick" text="Import" />
+            <Button mnemonicParsing="false" onAction="#exportClick" text="Export" />
+            <Button mnemonicParsing="false" onAction="#renameClick" text="Rename" />
+            <Button mnemonicParsing="false" onAction="#addClick" text="Add" />
+            <Button mnemonicParsing="false" onAction="#removeClick" text="Remove" />
+            <Button mnemonicParsing="false" onAction="#closeClick" text="Close" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

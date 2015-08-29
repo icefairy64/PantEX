@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="vbox" prefHeight="116.0" prefWidth="384.0" spacing="8.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cirnarium.pantex.gui.sources.LusciousOptionsController">
+   <padding>
+      <Insets bottom="14.0" left="14.0" right="14.0" top="14.0" />
+   </padding>
+   <children>
+      <Label prefWidth="150.0" text="Category:" />
+      <ComboBox fx:id="categoryField" prefWidth="150.0" promptText="Select..." VBox.vgrow="SOMETIMES" />
+      <HBox alignment="BOTTOM_RIGHT" prefWidth="150.0" spacing="8.0" VBox.vgrow="SOMETIMES">
+         <children>
+            <Button mnemonicParsing="false" onAction="#okClick" text="OK" />
+            <Button mnemonicParsing="false" onAction="#cancelClick" text="Cancel" />
+         </children>
+      </HBox>
+   </children>
+</VBox>
