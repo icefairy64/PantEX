@@ -66,8 +66,13 @@ public class SourceBrowserController implements Initializable {
         flowPane.prefWidthProperty().bind(scrollPane.widthProperty().subtract(2));
         shadeRect.widthProperty().bind(scrollPane.widthProperty());
         shadeRect.heightProperty().bind(scrollPane.heightProperty());
-        collectionSelector.getItems().addAll(Collection.dictionary.values());
-        collectionSelector.getSelectionModel().select(Collection.dictionary.get(0));
+        try {
+            collectionSelector.getItems().addAll(Collection.dictionary.values());
+        }
+        catch (Exception e) {
+            Static.handleException(e);
+        }
+        collectionSelector.getSelectionModel().select(Collection.dictionary.values().iterator().next());
         rightHBox.prefWidthProperty().bind(bottomPanel.widthProperty().subtract(leftHBox.widthProperty()));
         
         thumbSize = new SimpleIntegerProperty(100);

@@ -68,6 +68,16 @@ public final class Util {
             out.write(buf, 0, len);
         }
     }
+    
+    public static void copy(InputStream in, OutputStream out, int size) throws IOException {
+        int len = 0;
+        int read = 0;
+        byte[] buf = new byte[bufferSize];
+        while ((len = in.read(buf, 0, Math.min(bufferSize, size - read))) >= 0 && size != read) {
+            out.write(buf, 0, len);
+            read += len;
+        }
+    }
 
     public static InputStream fetchStream(String url) {
         try {

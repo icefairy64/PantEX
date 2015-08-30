@@ -11,6 +11,8 @@ import com.sun.javafx.collections.ObservableListWrapper;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
 
@@ -23,6 +25,7 @@ public class Static {
     public static FileChooser.ExtensionFilter imageExtFilter = new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif");
     public static ObservableList<EXImage> images = new ObservableListWrapper<>(new LinkedList<>());
     public static ExecutorService executor = Executors.newCachedThreadPool();
+    public static ObjectProperty<EXImage> currentImage = new SimpleObjectProperty<>();
     
     public static void rebuildImageList() {
         images.clear();
@@ -30,6 +33,10 @@ public class Static {
         for (Collection col : Collection.dictionary.values()) {
             images.addAll(col.images.values());
         }
+    }
+    
+    public static void handleException(Throwable e) {
+        throw new RuntimeException(e);
     }
     
 }

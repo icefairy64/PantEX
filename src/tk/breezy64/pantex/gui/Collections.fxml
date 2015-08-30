@@ -24,7 +24,16 @@
             <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0" HBox.hgrow="SOMETIMES">
                <children>
                   <Label text="Images:" />
-                  <ListView fx:id="imagesList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES" />
+                  <ListView fx:id="imagesList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
+                     <contextMenu>
+                        <ContextMenu fx:id="cM">
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#removeImagesClick" text="Remove" />
+                              <MenuItem mnemonicParsing="false" onAction="#moveImagesClick" text="Move to..." />
+                              <MenuItem mnemonicParsing="false" onAction="#exportImagesClick" text="Export..." />
+                          </items>
+                        </ContextMenu>
+                     </contextMenu></ListView>
                </children>
             </VBox>
          </items>

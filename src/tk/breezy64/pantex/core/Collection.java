@@ -5,8 +5,12 @@
  */
 package tk.breezy64.pantex.core;
 
+import com.sun.javafx.collections.ObservableMapWrapper;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javafx.beans.InvalidationListener;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableMap;
 
 /**
  *
@@ -15,16 +19,16 @@ import java.util.Map;
 public class Collection {
     public int id;
     public String title;
-    public Map<Integer, EXImage> images;
+    public ObservableMap<Integer, EXImage> images;
     public int maxImgId;
     
     protected Collection(int id, String title) {
         this.id = id;
         this.title = title;
-        this.images = new LinkedHashMap<>();
+        this.images = new ObservableMapWrapper<>(new LinkedHashMap<>());
     }
     
-    public void addImage(EXImage image) throws RuntimeException {
+    public void addImage(EXImage image) {
         image.id = maxImgId++;
         
         if (images.containsKey(image.id)) {
@@ -35,10 +39,20 @@ public class Collection {
         images.put(image.id, image);
     }
     
-    public void addImages(EXImage... images) throws RuntimeException {
+    public void addImages(EXImage... images) {
         for (EXImage img : images) {
             addImage(img);
         }
+    }
+    
+    public void removeImage(EXImage img) {
+        images.remove(img);
+    }
+    
+    public void moveImage(EXImage img, Collection col) {
+        images.remove(img);
+        img.setCollection(col);
+        col.addImage(img);
     }
 
     @Override
@@ -52,6 +66,17 @@ public class Collection {
         return res;
     }
     
-    public static Map<Integer, Collection> dictionary = new LinkedHashMap<>();
+    public static ObservableMap<Integer, Collection> initDictionary() {
+        ObservableMap<Integer, Collection> res = new ObservableMapWrapper<>(new LinkedHashMap<>());
+        res.addListener((MapChangeListener<Integer, Collection>)(x) -> { 
+                if (x.getValueRemoved() == defaultCollection) 
+                    defaultCollection = dictionary.values().iterator().next();
+            });
+        
+        return res;
+    }
+    
+    public static ObservableMap<Integer, Collection> dictionary = initDictionary();
+    public static Collection defaultCollection;
     private static int maxId = 0;
 }

@@ -35,6 +35,10 @@ public abstract class EXImage {
     public String toString() {
         return title;
     }
+
+    public void setCollection(Collection collection) {
+        this.collection = collection;
+    }
             
     public abstract Image getImage();
     public abstract void writeImage(OutputStream out);

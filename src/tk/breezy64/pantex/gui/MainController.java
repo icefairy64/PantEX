@@ -19,6 +19,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -88,6 +89,11 @@ public class MainController implements Initializable {
         image.fitHeightProperty().bind(imageScrollPane.heightProperty());
         imageBg.widthProperty().bind(imageScrollPane.widthProperty());
         imageBg.heightProperty().bind(imageScrollPane.heightProperty());
+        
+        Static.currentImage.addListener((ChangeListener<EXImage>)(o, oV, nV) -> {
+            indicateProgressStart();
+            Static.executor.submit(() -> { Image x = nV.getImage(); onImageLoaded(x); });
+        });
     }    
 
     @FXML
@@ -129,8 +135,7 @@ public class MainController implements Initializable {
         event.consume();
         if (event.getClickCount() == 2) {
             EXImage img = imagesList.getSelectionModel().getSelectedItem();
-            indicateProgressStart();
-            Static.executor.submit(() -> { Image x = img.getImage(); onImageLoaded(x); });
+            Static.currentImage.set(img);
         }
     }
     
@@ -197,7 +202,7 @@ public class MainController implements Initializable {
         
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Danbooru [search]");
-        dialog.setHeaderText("Danbooru");
+        dialog.setHeaderText("Search on Danbooru");
         dialog.setContentText("Tags:");
         Optional<String> result = dialog.showAndWait();
         if (!result.isPresent()) {

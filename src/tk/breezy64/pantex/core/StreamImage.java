@@ -32,8 +32,9 @@ public class StreamImage extends EXImage {
     public Image getImage() {
         Image result = cachedImage.get();
         if (result == null) {
-            try {
+            /*try {
                 File f = File.createTempFile("PantTX", ".png");
+                f.deleteOnExit();
                 FileOutputStream s = new FileOutputStream(f);
                 Util.copy(stream, s);
                 s.close();
@@ -42,7 +43,7 @@ public class StreamImage extends EXImage {
             }
             catch (Exception e) {
                 throw new RuntimeException(e);
-            }
+            }*/
             result = new Image(stream);
             cachedImage = new SoftReference<>(result);
         }
@@ -53,7 +54,7 @@ public class StreamImage extends EXImage {
     public void writeImage(OutputStream out) {
         try {
             stream.reset();
-            Util.copy(stream, out);
+            Util.copy(stream, out, expectedSize);
         }
         catch (Exception e) {
             throw new RuntimeException(e);
