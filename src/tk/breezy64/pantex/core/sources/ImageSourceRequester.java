@@ -30,7 +30,9 @@ public abstract class ImageSourceRequester<T extends ImageSource> implements Ext
         }
         
         T result = performRequest();
-        finishHandler.accept(result);
+        if (result != null) {
+            finishHandler.accept(result);
+        }
     }
     
     public T requestAndWait() {

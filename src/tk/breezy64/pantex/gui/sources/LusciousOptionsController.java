@@ -54,7 +54,11 @@ public class LusciousOptionsController implements Initializable {
             browser.show();
             browser.toFront();
             
-            Static.executor.submit(() -> flag.notifyAll());
+            Static.executor.submit(() -> {
+                synchronized (flag) {
+                    flag.notifyAll();
+                }
+            });
         }
         
         categoryField.getScene().getWindow().hide();

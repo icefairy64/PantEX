@@ -6,11 +6,15 @@
 package tk.breezy64.pantex.gui.sources;
 
 import java.io.IOException;
+import java.util.Optional;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.ChoiceDialog;
 import javafx.stage.Stage;
 import ro.fortsoft.pf4j.Extension;
 import tk.breezy64.pantex.core.sources.ImageSourceRequester;
+import tk.breezy64.pantex.core.sources.LusciousCategory;
 import tk.breezy64.pantex.core.sources.LusciousSource;
 import tk.breezy64.pantex.gui.Static;
 
@@ -32,25 +36,13 @@ public class LusciousRequester extends ImageSourceRequester<LusciousSource> {
     }
 
     @Override
-    protected synchronized LusciousSource performRequest() {
-        try {
-            Scene browserScene = new Scene(FXMLLoader.load(getClass().getResource("LusciousOptions.fxml")));
-            browserScene.setUserData(new Integer(0));
-            Stage browser = new Stage();
-            browser.setTitle("Luscious");
-            browser.setScene(browserScene);
-            browser.show();
-            try {
-                browserScene.getUserData().wait();
-            }
-            catch (InterruptedException e) {
-            }
-            return (LusciousSource)browserScene.getUserData();
-        }
-        catch (IOException e) {
-            Static.handleException(e);
-        }
-        return null;
+    protected LusciousSource performRequest() {
+        ChoiceDialog<LusciousCategory> chooser = new ChoiceDialog<>(LusciousCategory.list.get(0), LusciousCategory.list);
+        chooser.setTitle("Luscious");
+        chooser.setHeaderText("Choose a category");
+        chooser.setContentText("Select:");
+        Optional<LusciousCategory> res = chooser.showAndWait();
+        return res.isPresent() ? new LusciousSource(res.get().name) : null;
     }
     
 }
