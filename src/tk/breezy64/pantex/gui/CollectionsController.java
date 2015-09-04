@@ -123,7 +123,7 @@ public class CollectionsController implements Initializable {
         try {
             Collection col = EXPack.load(f);
            
-            Platform.runLater(() -> { indicateProgressEnd(); collectionsList.getItems().add(col); Static.rebuildImageList(); });
+            Platform.runLater(() -> { indicateProgressEnd(); collectionsList.getItems().add(col); /*Static.rebuildImageList();*/ });
         }
         catch (Exception e) {
             throw new RuntimeException(e);

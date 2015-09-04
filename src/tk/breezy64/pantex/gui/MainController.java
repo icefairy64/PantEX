@@ -15,10 +15,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -92,7 +88,7 @@ public class MainController implements Initializable {
         
         Static.currentImage.addListener((ChangeListener<EXImage>)(o, oV, nV) -> {
             indicateProgressStart();
-            Static.executor.submit(() -> { Image x = nV.getImage(); onImageLoaded(x); });
+            Static.executor.submit(() -> { Image x = FXImage.fromEX(nV); onImageLoaded(x); });
         });
     }    
 
@@ -115,7 +111,7 @@ public class MainController implements Initializable {
             }
             col.addImages(imgs);
             
-            Static.rebuildImageList();
+            //Static.rebuildImageList();
         }
         
         dialog.close();
@@ -170,7 +166,7 @@ public class MainController implements Initializable {
             img.collection.addImage(img);
         }
         
-        Platform.runLater(() -> Static.rebuildImageList());
+        //Platform.runLater(() -> Static.rebuildImageList());
     }
 
     @FXML

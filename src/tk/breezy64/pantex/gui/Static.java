@@ -11,6 +11,7 @@ import com.sun.javafx.collections.ObservableListWrapper;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -28,11 +29,13 @@ public class Static {
     public static ObjectProperty<EXImage> currentImage = new SimpleObjectProperty<>();
     
     public static void rebuildImageList() {
-        images.clear();
-        
-        for (Collection col : Collection.dictionary.values()) {
-            images.addAll(col.images.values());
-        }
+        Platform.runLater(() ->{
+            images.clear();
+
+            for (Collection col : Collection.dictionary.values()) {
+                images.addAll(col.images.values());
+            }
+        });
     }
     
     public static void handleException(Throwable e) {

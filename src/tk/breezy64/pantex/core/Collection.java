@@ -7,10 +7,9 @@ package tk.breezy64.pantex.core;
 
 import com.sun.javafx.collections.ObservableMapWrapper;
 import java.util.LinkedHashMap;
-import java.util.Map;
-import javafx.beans.InvalidationListener;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
+import tk.breezy64.pantex.gui.Static;
 
 /**
  *
@@ -26,6 +25,8 @@ public class Collection {
         this.id = id;
         this.title = title;
         this.images = new ObservableMapWrapper<>(new LinkedHashMap<>());
+        this.images.addListener((MapChangeListener<Integer, EXImage>)(x) ->
+                Static.rebuildImageList());
     }
     
     public void addImage(EXImage image) {
@@ -69,6 +70,8 @@ public class Collection {
     public static ObservableMap<Integer, Collection> initDictionary() {
         ObservableMap<Integer, Collection> res = new ObservableMapWrapper<>(new LinkedHashMap<>());
         res.addListener((MapChangeListener<Integer, Collection>)(x) -> { 
+                Static.rebuildImageList();
+            
                 if (x.getValueRemoved() == defaultCollection) 
                     defaultCollection = dictionary.values().iterator().next();
             });

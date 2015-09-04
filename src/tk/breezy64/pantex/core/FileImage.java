@@ -5,13 +5,12 @@
  */
 package tk.breezy64.pantex.core;
 
-import javafx.scene.image.Image;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.SoftReference;
 import java.util.List;
 
 /**
@@ -34,23 +33,10 @@ public class FileImage extends EXImage {
         }
         this.file = file;
     }
-    
+
     @Override
-    public Image getImage() {
-        Image result = cachedImage.get();
-        
-        if (result == null) {
-            try {
-                result = new Image(new FileInputStream(file));
-            }
-            catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            
-            cachedImage = new SoftReference<>(result);
-        }
-        
-        return result;
+    public InputStream getImageStream() throws IOException {
+        return new FileInputStream(file);
     }
 
     @Override

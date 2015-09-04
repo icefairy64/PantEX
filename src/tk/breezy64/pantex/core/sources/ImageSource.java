@@ -7,12 +7,13 @@ package tk.breezy64.pantex.core.sources;
 
 import tk.breezy64.pantex.core.EXImage;
 import java.util.Iterator;
+import ro.fortsoft.pf4j.ExtensionPoint;
 
 /**
  *
  * @author icefairy64
  */
-public abstract class ImageSource implements Iterator<EXImage[]> {
+public abstract class ImageSource implements Iterator<EXImage[]>, ExtensionPoint {
     
     protected EXImage[] cache;
     protected boolean endReached = false;

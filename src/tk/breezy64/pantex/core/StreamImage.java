@@ -5,12 +5,10 @@
  */
 package tk.breezy64.pantex.core;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.SoftReference;
 import java.util.List;
-import javafx.scene.image.Image;
 
 /**
  *
@@ -27,27 +25,11 @@ public class StreamImage extends EXImage {
         this.stream = stream;
         this.expectedSize = expectedSize;
     }
-    
+
     @Override
-    public Image getImage() {
-        Image result = cachedImage.get();
-        if (result == null) {
-            /*try {
-                File f = File.createTempFile("PantTX", ".png");
-                f.deleteOnExit();
-                FileOutputStream s = new FileOutputStream(f);
-                Util.copy(stream, s);
-                s.close();
-                
-                stream.reset();
-            }
-            catch (Exception e) {
-                throw new RuntimeException(e);
-            }*/
-            result = new Image(stream);
-            cachedImage = new SoftReference<>(result);
-        }
-        return result;
+    public InputStream getImageStream() throws IOException {
+        stream.reset();
+        return stream;
     }
 
     @Override

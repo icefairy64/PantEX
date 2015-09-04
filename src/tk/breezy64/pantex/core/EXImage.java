@@ -5,30 +5,28 @@
  */
 package tk.breezy64.pantex.core;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.SoftReference;
 import java.util.LinkedList;
 import java.util.List;
-import javafx.scene.image.Image;
+import ro.fortsoft.pf4j.ExtensionPoint;
 
 /**
  *
  * @author icefairy64
  */
-public abstract class EXImage {
+public abstract class EXImage implements ExtensionPoint {
     public List<Tag> tags;
     public Collection collection;
     public String title;
     public String thumbURL;
     public int id;
-    
-    protected SoftReference<Image> cachedImage;
-    
+
     protected EXImage(Collection collection, String title, List<Tag> tags) {
         this.tags = tags == null ? new LinkedList<>() : tags;
         this.collection = collection;
         this.title = title;
-        this.cachedImage = new SoftReference<>(null);
     }
 
     @Override
@@ -39,8 +37,8 @@ public abstract class EXImage {
     public void setCollection(Collection collection) {
         this.collection = collection;
     }
-            
-    public abstract Image getImage();
+    
+    public abstract InputStream getImageStream() throws IOException;
     public abstract void writeImage(OutputStream out);
     public abstract int getImageSize();
     

@@ -6,7 +6,6 @@
 package tk.breezy64.pantex.core.sources;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URLEncoder;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.RemoteImage;
@@ -15,8 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.http.client.utils.URIUtils;
-import sun.net.util.URLUtil;
 
 /**
  *

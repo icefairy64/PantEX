@@ -7,10 +7,10 @@ package tk.breezy64.pantex.core;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import javafx.scene.image.Image;
 
 /**
  *
@@ -26,14 +26,13 @@ public class RemoteImage extends EXImage {
         
         this.url = url;
     }
-
+    
     @Override
-    public Image getImage() {
+    public InputStream getImageStream() throws IOException {
         if (local == null) {
             load();
         }
-        
-        return local.getImage();
+        return local.getImageStream();
     }
     
     private void load() {

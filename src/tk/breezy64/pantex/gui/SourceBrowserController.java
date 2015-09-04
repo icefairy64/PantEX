@@ -129,7 +129,7 @@ public class SourceBrowserController implements Initializable {
         view.setOnMouseClicked((e) -> {
             if (e.getClickCount() == 2) {
                 collectionSelector.getSelectionModel().getSelectedItem().addImage(img);
-                Platform.runLater(() -> Static.rebuildImageList());
+                //Platform.runLater(() -> Static.rebuildImageList());
             }
             e.consume();
         });
