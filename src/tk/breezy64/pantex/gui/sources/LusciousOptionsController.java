@@ -18,6 +18,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tk.breezy64.pantex.gui.SourceBrowserController;
+import tk.breezy64.pantex.gui.Static;
 
 /**
  * FXML Controller class
@@ -40,21 +41,28 @@ public class LusciousOptionsController implements Initializable {
     }    
 
     @FXML
-    private void okClick(ActionEvent event) throws Exception {
-        Scene browserScene = new Scene(FXMLLoader.load(SourceBrowserController.class.getResource("SourceBrowser.fxml")));
-        browserScene.setUserData(new LusciousSource(categoryField.getSelectionModel().getSelectedItem().name));
-        
-        Stage browser = new Stage();
-        browser.setTitle("Luscious browser");
-        browser.setScene(browserScene);
-        browser.show();
+    private synchronized void okClick(ActionEvent event) throws Exception {
+        if (categoryField.getScene().getUserData() == null) {
+            Scene browserScene = new Scene(FXMLLoader.load(SourceBrowserController.class.getResource("SourceBrowser.fxml")));
+            browserScene.setUserData(new LusciousSource(categoryField.getSelectionModel().getSelectedItem().name));
+            Object flag = categoryField.getScene().getUserData();
+            categoryField.getScene().setUserData(browserScene.getUserData());
+
+            Stage browser = new Stage();
+            browser.setTitle("Luscious browser");
+            browser.setScene(browserScene);
+            browser.show();
+            browser.toFront();
+            
+            Static.executor.submit(() -> flag.notifyAll());
+        }
         
         categoryField.getScene().getWindow().hide();
-        browser.toFront();
     }
 
     @FXML
     private void cancelClick(ActionEvent event) {
+        categoryField.getScene().setUserData(null);
         categoryField.getScene().getWindow().hide();
     }
 }

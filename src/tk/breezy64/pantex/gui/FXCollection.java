@@ -7,6 +7,7 @@ package tk.breezy64.pantex.gui;
 
 import com.sun.javafx.collections.ObservableMapWrapper;
 import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
 import tk.breezy64.pantex.core.Collection;
@@ -48,7 +49,7 @@ public class FXCollection extends Collection {
     
     @Override
     public EXImage[] getImages() {
-        return images.values().toArray(new EXImage[0]);
+        return images.values().stream().map((x) -> x.getEXImage()).collect(Collectors.toList()).toArray(new EXImage[0]);
     }
     
     public static ObservableMap<Integer, FXCollection> initDictionary() {

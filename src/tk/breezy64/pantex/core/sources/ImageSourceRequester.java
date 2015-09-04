@@ -37,6 +37,9 @@ public abstract class ImageSourceRequester<T extends ImageSource> implements Ext
         return performRequest();
     }
 
+    public abstract String getCategory();
+    public abstract String getTitle();
+    
     protected abstract T performRequest();
     
 }

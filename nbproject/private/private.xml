@@ -3,14 +3,31 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/sources/LusciousSource.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/ExportException.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/PantEX.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/SourceBrowserController.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/Util.java</file>
-            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/sources/DanbooruSource.java</file>
-            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/FileImage.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/EXPack.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/sources/LusciousOptionsController.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/MainController.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/EXImage.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/FXCollection.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/Collection.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/sources/LusciousSource.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/CollectionSelectorController.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/Exporter.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/sources/DanbooruSource.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/sources/ImageSource.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/sources/ImageSourceRequester.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/Importer.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/FXImage.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/CollectionsController.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/RemoteImage.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/StreamImage.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/FileImage.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/EXPackWrapper.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/Static.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/SimpleCollection.java</file>
         </group>
     </open-files>
 </project-private>

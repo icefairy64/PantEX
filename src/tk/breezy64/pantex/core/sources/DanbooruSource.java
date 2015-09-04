@@ -37,17 +37,12 @@ public class DanbooruSource extends ImageSource {
     
     public DanbooruSource(String query) {
         super();
-        try {
-            url = searchURL.replace("%s", URLEncoder.encode(query, "UTF-8"));
-        }
-        catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        url = searchURL.replace("%s", URLEncoder.encode(query));
     }
     
     @Override
     protected void load(int page) {
-        String lurl = String.format(url, page + 1);
+        String lurl = url.replace("%d", Integer.toString(page + 1));
         String content = Util.fetch(lurl);
         Matcher m = imgPattern.matcher(content);
         Matcher t = thumbPattern.matcher(content);

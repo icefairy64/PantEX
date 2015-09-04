@@ -71,11 +71,11 @@ public class CollectionsController implements Initializable {
         
         // Filling import/export buttons
         
-        importButton.getItems().add(createImportItem(EXPackWrapper.getInstance()));
+        //importButton.getItems().add(createImportItem(EXPackWrapper.getInstance()));
         importButton.getItems().addAll(Static.pluginManager.getExtensions(Importer.class).stream()
                 .map((x) -> createImportItem(x)).collect(Collectors.toList()));
         
-        exportButton.getItems().add(createExportItem(EXPackWrapper.getInstance()));
+        //exportButton.getItems().add(createExportItem(EXPackWrapper.getInstance()));
         exportButton.getItems().addAll(Static.pluginManager.getExtensions(Exporter.class).stream()
                 .map((x) -> createExportItem(x)).collect(Collectors.toList()));
     }

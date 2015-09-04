@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.stage.FileChooser;
+import ro.fortsoft.pf4j.Extension;
 import tk.breezy64.pantex.core.Collection;
 import tk.breezy64.pantex.core.EXPack;
 import tk.breezy64.pantex.core.ExportException;
@@ -21,6 +22,7 @@ import tk.breezy64.pantex.core.Importer;
  *
  * @author icefairy64
  */
+@Extension
 public class EXPackWrapper implements Importer, Exporter {
     
     private Consumer<Collection> importHandler;
@@ -56,7 +58,7 @@ public class EXPackWrapper implements Importer, Exporter {
     public void export(Collection col) throws IOException, ExportException {
         FileChooser ch = new FileChooser();
         Platform.runLater(() -> {
-            File f = ch.showOpenDialog(null);
+            File f = ch.showSaveDialog(null);
             Static.executor.submit(() -> {
                 if (f != null) {
                     try {
@@ -87,7 +89,7 @@ public class EXPackWrapper implements Importer, Exporter {
     
     // Static
     
-    private static EXPackWrapper instance = new EXPackWrapper();
+    private final static EXPackWrapper instance = new EXPackWrapper();
 
     public static EXPackWrapper getInstance() {
         return instance;

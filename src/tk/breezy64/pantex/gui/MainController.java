@@ -12,9 +12,10 @@ import tk.breezy64.pantex.core.sources.DanbooruSource;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,11 +23,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -37,6 +38,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import tk.breezy64.pantex.core.sources.ImageSource;
+import tk.breezy64.pantex.core.sources.ImageSourceRequester;
 
 /**
  * FXML Controller class
@@ -69,6 +72,8 @@ public class MainController implements Initializable {
     private ScrollPane imageScrollPane;
     @FXML
     private StackPane imageStackPane;
+    @FXML
+    private Menu sourcesMenu;
     
     /**
      * Initializes the controller class.
@@ -90,6 +95,8 @@ public class MainController implements Initializable {
             indicateProgressStart();
             Static.executor.submit(() -> { Image x = nV.get(); onImageLoaded(x); });
         });
+        
+        refreshSources();
     }    
 
     @FXML
@@ -152,7 +159,6 @@ public class MainController implements Initializable {
         imagePane.setEffect(null);
     }
     
-    @FXML
     private void fetchDanbooru(ActionEvent event) {
         indicateProgressStart();
         Static.executor.submit(() -> onFetch(danbooru.next()));
@@ -168,51 +174,43 @@ public class MainController implements Initializable {
         
         //Platform.runLater(() -> Static.rebuildImageList());
     }
-
-    @FXML
-    private void browseDanbooru(ActionEvent event) throws Exception {
-        Scene browserScene = new Scene(FXMLLoader.load(getClass().getResource("SourceBrowser.fxml")));
-        browserScene.setUserData(danbooru);
-        
-        Stage browser = new Stage();
-        browser.setTitle("Danbooru browser");
-        browser.setScene(browserScene);
-        browser.show();
-        
-        event.consume();
+    
+    private void showSourceBrowser(ImageSource src) {
+        try {
+            Scene browserScene = new Scene(FXMLLoader.load(getClass().getResource("SourceBrowser.fxml")));
+            browserScene.setUserData(src);
+            Stage browser = new Stage();
+            browser.setTitle("Danbooru browser");
+            browser.setScene(browserScene);
+            browser.show();
+        }
+        catch (Exception e) {
+            Static.handleException(e);
+        }
     }
-
-    @FXML
-    private void browseLusciousSimple(ActionEvent event) throws Exception {
-        Scene browserScene = new Scene(FXMLLoader.load(getClass().getResource("sources/LusciousOptions.fxml")));
-        Stage browser = new Stage();
-        browser.setTitle("Luscious");
-        browser.setScene(browserScene);
-        browser.show();
-        event.consume();
-    }
-
-    @FXML
-    private void browseDanbooruSearch(ActionEvent event) throws Exception {
-        Scene browserScene = new Scene(FXMLLoader.load(getClass().getResource("SourceBrowser.fxml")));
+    
+    private void refreshSources() {
+        List<MenuItem> list = sourcesMenu.getItems();
+        list.clear();
+        List<Menu> catList = new ArrayList<>();
         
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Danbooru [search]");
-        dialog.setHeaderText("Search on Danbooru");
-        dialog.setContentText("Tags:");
-        Optional<String> result = dialog.showAndWait();
-        if (!result.isPresent()) {
-            return;
+        for (ImageSourceRequester<? extends ImageSource> req : Static.pluginManager.getExtensions(ImageSourceRequester.class)) {
+            MenuItem item = new MenuItem(req.getTitle());
+            item.setOnAction((e) -> {
+                req.onFinish((x) -> showSourceBrowser(x)).request();
+                e.consume();
+            });
+            
+            Menu res = catList.stream().reduce(null, (a, x) -> a == null ? (req.getCategory().equals(x.getText()) ? x : null) : a);
+            if (res == null) {
+                res = new Menu(req.getCategory());
+                catList.add(res);
+            }
+            
+            res.getItems().add(item);
         }
         
-        browserScene.setUserData(new DanbooruSource(result.get()));
-        
-        Stage browser = new Stage();
-        browser.setTitle("Danbooru browser");
-        browser.setScene(browserScene);
-        browser.show();
-        
-        event.consume();
+        Platform.runLater(() -> sourcesMenu.getItems().addAll(catList));
     }
     
 }

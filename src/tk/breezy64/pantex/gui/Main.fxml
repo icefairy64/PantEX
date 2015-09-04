@@ -19,22 +19,7 @@
                   <MenuItem fx:id="collectionsButton" mnemonicParsing="false" onAction="#showCollections" text="Collections..." />
             </items>
           </Menu>
-            <Menu mnemonicParsing="false" text="Fetch">
-              <items>
-                  <Menu mnemonicParsing="false" text="Danbooru">
-                    <items>
-                      <MenuItem mnemonicParsing="false" onAction="#fetchDanbooru" text="Add" />
-                        <MenuItem mnemonicParsing="false" onAction="#browseDanbooru" text="Browse..." />
-                        <MenuItem mnemonicParsing="false" onAction="#browseDanbooruSearch" text="Search..." />
-                    </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Luscious">
-                    <items>
-                      <MenuItem mnemonicParsing="false" onAction="#browseLusciousSimple" text="Simple..." />
-                    </items>
-                  </Menu>
-              </items>
-            </Menu>
+            <Menu fx:id="sourcesMenu" mnemonicParsing="false" text="Sources" />
         </menus>
       </MenuBar>
       <SplitPane dividerPositions="0.25" prefHeight="372.0" prefWidth="600.0" VBox.vgrow="SOMETIMES">

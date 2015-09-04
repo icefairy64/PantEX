@@ -89,13 +89,18 @@ public class SourceBrowserController implements Initializable {
     }
     
     private void fetch() {
-        EXImage[] imgs = src.next();
-        if (imgs == null) {
-            return;
-        } 
-        
-        for (EXImage img : imgs) {
-            Static.executor.submit(() -> fetchImage(img));
+        try {
+            EXImage[] imgs = src.next();
+            if (imgs == null) {
+                return;
+            }
+
+            for (EXImage img : imgs) {
+                Static.executor.submit(() -> fetchImage(img));
+            }
+        }
+        catch (Exception e) {
+            Static.handleException(e);
         }
         
         indicateProgressEnd();
