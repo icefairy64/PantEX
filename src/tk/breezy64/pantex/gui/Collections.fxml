@@ -51,12 +51,12 @@
                   <Insets bottom="4.0" top="4.0" />
                </HBox.margin>
             </ProgressIndicator>
-            <Button mnemonicParsing="false" onAction="#importClick" text="Import" />
-            <Button mnemonicParsing="false" onAction="#exportClick" text="Export" />
-            <Button mnemonicParsing="false" onAction="#renameClick" text="Rename" />
-            <Button mnemonicParsing="false" onAction="#addClick" text="Add" />
-            <Button mnemonicParsing="false" onAction="#removeClick" text="Remove" />
-            <Button mnemonicParsing="false" onAction="#closeClick" text="Close" />
+            <MenuButton fx:id="importButton" minWidth="-Infinity" mnemonicParsing="false" text="Import" />
+            <MenuButton fx:id="exportButton" minWidth="-Infinity" mnemonicParsing="false" text="Export" />
+            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#renameClick" text="Rename" />
+            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#addClick" text="Add" />
+            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#removeClick" text="Remove" />
+            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#closeClick" text="Close" />
          </children>
       </HBox>
    </children>

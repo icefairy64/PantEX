@@ -54,7 +54,8 @@ public class FXCollection extends Collection {
     public static ObservableMap<Integer, FXCollection> initDictionary() {
         ObservableMap<Integer, FXCollection> res = new ObservableMapWrapper<>(new LinkedHashMap<>());
         res.addListener((MapChangeListener<Integer, FXCollection>)(x) -> { 
-                Static.rebuildImageList();
+                if (x.getValueRemoved() != null)    
+                    Static.rebuildImageList();
             
                 if (x.getValueRemoved() == defaultCollection) 
                     defaultCollection = dictionary.values().iterator().next();

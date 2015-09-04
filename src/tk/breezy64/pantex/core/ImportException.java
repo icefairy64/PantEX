@@ -9,20 +9,20 @@ package tk.breezy64.pantex.core;
  *
  * @author icefairy64
  */
-public class EXPackException extends Exception {
+public class ImportException extends Exception {
 
-    public EXPackException(String message) {
+    public ImportException(String message) {
         super(message);
     }
 
-    public EXPackException() {
+    public ImportException() {
     }
 
-    public EXPackException(Throwable cause) {
+    public ImportException(Throwable cause) {
         super(cause);
     }
 
-    public EXPackException(String message, Throwable cause) {
+    public ImportException(String message, Throwable cause) {
         super(message, cause);
     }
     

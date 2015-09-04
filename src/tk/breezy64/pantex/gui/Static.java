@@ -14,6 +14,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
+import ro.fortsoft.pf4j.DefaultPluginManager;
+import ro.fortsoft.pf4j.PluginManager;
 
 /**
  *
@@ -25,6 +27,7 @@ public class Static {
     public static ObservableList<FXImage> images = new ObservableListWrapper<>(new LinkedList<>());
     public static ExecutorService executor = Executors.newCachedThreadPool();
     public static ObjectProperty<FXImage> currentImage = new SimpleObjectProperty<>();
+    public static PluginManager pluginManager = createPluginManager();
     
     public static void rebuildImageList() {
         Platform.runLater(() ->{
@@ -36,7 +39,13 @@ public class Static {
         });
     }
     
+    public static PluginManager createPluginManager() {
+        PluginManager pm = new DefaultPluginManager();
+        return pm;
+    }
+    
     public static void handleException(Throwable e) {
+        e.printStackTrace();
         throw new RuntimeException(e);
     }
     

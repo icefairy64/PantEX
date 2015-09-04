@@ -11,15 +11,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -27,11 +24,14 @@ import java.util.stream.Collectors;
  * @author icefairy64
  */
 public class EXPack {
+
+    //@Override
+    public String getTitle() {
+        return "EXPack";
+    }
     
-    private static final byte[] signature = { 0x50, 0x41, 0x4e, 0x54, 0x53, 0x55, 0x45, 0x58 };
-    private static final int separator = 0x00;
-    
-    public static Collection load(File file, Collection res) throws IOException, EXPackException {
+    //@Override
+    public void load(File file, Collection res) throws IOException, ImportException {
         if (!file.exists() || !file.isFile()) {
             throw new FileNotFoundException(String.format("EXPack is not found at path %s", file.getPath()));
         }
@@ -40,13 +40,12 @@ public class EXPack {
         FileChannel ch = f.getChannel();
         
         if (!checkSignature(f)) {
-            throw new EXPackException("Signature check failed");
+            throw new ImportException("Signature check failed");
         }
         
         // Reading title
         String title = Util.readStr(f, separator);
         res.title = title;
-        //DefaultCollection res = new DefaultCollection(title);
         
         // Reading tags
         int tagCount = Util.readInt(ch);
@@ -90,11 +89,9 @@ public class EXPack {
             
             offset += imgSizes[i];
         }
-        
-        return res;
     }
     
-    public static void write(Collection col, File file) throws IOException {
+    public void write(Collection col, File file) throws IOException {
         FileOutputStream out = new FileOutputStream(file);
         FileChannel ch = out.getChannel();
         
@@ -132,6 +129,24 @@ public class EXPack {
         }
         
         out.close();
+    }
+    
+    // Static
+    
+    private static final byte[] signature = { 0x50, 0x41, 0x4e, 0x54, 0x53, 0x55, 0x45, 0x58 };
+    private static final int separator = 0x00;
+    private static EXPack instance = new EXPack();
+    
+    public static void loadCollection(File file, Collection res) throws IOException, ImportException {
+        instance.load(file, res);
+    }
+    
+    public static EXPack getInstance() {
+        return instance;
+    }
+    
+    public static void writeCollection(Collection res, File file) throws IOException {
+        instance.write(res, file);
     }
     
     private static boolean checkSignature(InputStream s) throws IOException {

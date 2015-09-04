@@ -24,11 +24,16 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import tk.breezy64.pantex.core.Collection;
+import tk.breezy64.pantex.core.Exporter;
+import tk.breezy64.pantex.core.Importer;
 
 /**
  * FXML Controller class
@@ -44,6 +49,10 @@ public class CollectionsController implements Initializable {
     private ProgressIndicator progressIndicator;
     @FXML
     private ContextMenu cM;
+    @FXML
+    private MenuButton importButton;
+    @FXML
+    private MenuButton exportButton;
 
     /**
      * Initializes the controller class.
@@ -59,9 +68,46 @@ public class CollectionsController implements Initializable {
                 collectionsList.getSelectionModel().selectedItemProperty(), collectionsList.getSelectionModel().getSelectedItem().images));
         imagesList.getSelectionModel().selectedItemProperty().addListener((ChangeListener<FXImage>)(x, oV, nV) -> 
                 Static.currentImage.set(nV));
-    }    
+        
+        // Filling import/export buttons
+        
+        importButton.getItems().add(createImportItem(EXPackWrapper.getInstance()));
+        importButton.getItems().addAll(Static.pluginManager.getExtensions(Importer.class).stream()
+                .map((x) -> createImportItem(x)).collect(Collectors.toList()));
+        
+        exportButton.getItems().add(createExportItem(EXPackWrapper.getInstance()));
+        exportButton.getItems().addAll(Static.pluginManager.getExtensions(Exporter.class).stream()
+                .map((x) -> createExportItem(x)).collect(Collectors.toList()));
+    }
+   
+    private MenuItem createImportItem(Importer x) {
+        MenuItem item = new MenuItem(x.getTitle());
+            item.setOnAction((ev) -> {
+                indicateProgressStart();
+                Static.executor.submit(() -> load(x));
+                ev.consume();
+            });
+            return item;
+    }
+    
+    private MenuItem createExportItem(Exporter x) {
+        MenuItem item = new MenuItem(x.getTitle());
+            item.setOnAction((ev) -> {
+                indicateProgressStart();
+                Static.executor.submit(() -> { 
+                    try { 
+                        x.export(collectionsList.getSelectionModel().getSelectedItem()); 
+                    } 
+                    catch (Exception e) { 
+                        Static.handleException(e); 
+                    } 
+                    Platform.runLater(() -> indicateProgressEnd()); 
+                });
+                ev.consume();
+            });
+            return item;
+    }
 
-    @FXML
     private void exportClick(ActionEvent event) {
         event.consume();
         FileChooser ch = new FileChooser();
@@ -70,7 +116,7 @@ public class CollectionsController implements Initializable {
         indicateProgressStart();
         Static.executor.submit(() -> { 
             try { 
-                EXPack.write(collectionsList.getSelectionModel().getSelectedItem(), f); 
+                EXPack.writeCollection(collectionsList.getSelectionModel().getSelectedItem(), f); 
             } 
             catch (Exception e) { 
                 throw new RuntimeException(e); 
@@ -103,26 +149,20 @@ public class CollectionsController implements Initializable {
         progressIndicator.setVisible(false);
     }
 
-    @FXML
     private void importClick(ActionEvent event) {
         event.consume();
-        FileChooser ch = new FileChooser();
-        File f = ch.showOpenDialog(imagesList.getScene().getWindow());
-        
         indicateProgressStart();
-        Static.executor.submit(() -> load(f));
-        
+        Static.executor.submit(() -> load(EXPackWrapper.getInstance()));
     }
     
-    private void load(File f) {
+    private void load(Importer imp) {
         try {
             FXCollection col = FXCollection.create("");
-            EXPack.load(f, col);
-           
-            Platform.runLater(() -> { indicateProgressEnd(); collectionsList.getItems().add(col); /*Static.rebuildImageList();*/ });
+            imp.afterImport((x) -> Platform.runLater(() -> { indicateProgressEnd(); collectionsList.getItems().add(col); }))
+                    .load(col);
         }
         catch (Exception e) {
-            throw new RuntimeException(e);
+            Static.handleException(e);
         }
     }
 

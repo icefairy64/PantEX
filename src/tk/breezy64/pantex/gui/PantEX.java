@@ -23,6 +23,8 @@ public class PantEX extends Application {
         super.init();
         
         FXCollection.create("Temp");
+        Static.pluginManager.loadPlugins();
+        Static.pluginManager.startPlugins();
     }
     
     @Override
