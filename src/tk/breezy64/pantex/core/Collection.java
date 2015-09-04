@@ -5,53 +5,28 @@
  */
 package tk.breezy64.pantex.core;
 
-import com.sun.javafx.collections.ObservableMapWrapper;
-import java.util.LinkedHashMap;
-import javafx.collections.MapChangeListener;
-import javafx.collections.ObservableMap;
-import tk.breezy64.pantex.gui.Static;
-
 /**
  *
  * @author icefairy64
  */
-public class Collection {
-    public int id;
+public abstract class Collection {
+    
     public String title;
-    public ObservableMap<Integer, EXImage> images;
-    public int maxImgId;
-    
-    protected Collection(int id, String title) {
-        this.id = id;
+    public final int id;
+
+    public Collection(String title) {
         this.title = title;
-        this.images = new ObservableMapWrapper<>(new LinkedHashMap<>());
-        this.images.addListener((MapChangeListener<Integer, EXImage>)(x) ->
-                Static.rebuildImageList());
+        this.id = lastID++;
     }
     
-    public void addImage(EXImage image) {
-        image.id = maxImgId++;
-        
-        if (images.containsKey(image.id)) {
-            throw new RuntimeException(new CollectionException(
-                    String.format("Image with ID %d is already exists in collection %s", image.id, title)));
-        }
-        
-        images.put(image.id, image);
-    }
-    
-    public void addImages(EXImage... images) {
-        for (EXImage img : images) {
+    public void addImages(EXImage... imgs) {
+        for (EXImage img : imgs) {
             addImage(img);
         }
     }
     
-    public void removeImage(EXImage img) {
-        images.remove(img);
-    }
-    
     public void moveImage(EXImage img, Collection col) {
-        images.remove(img);
+        removeImage(img);
         img.setCollection(col);
         col.addImage(img);
     }
@@ -61,25 +36,10 @@ public class Collection {
         return title;
     }
     
-    public static Collection create(String title) {
-        Collection res = new Collection(maxId++, title);
-        dictionary.put(maxId - 1, res);
-        return res;
-    }
+    public abstract EXImage[] getImages();
+    public abstract void addImage(EXImage img);
+    public abstract void removeImage(EXImage img);
     
-    public static ObservableMap<Integer, Collection> initDictionary() {
-        ObservableMap<Integer, Collection> res = new ObservableMapWrapper<>(new LinkedHashMap<>());
-        res.addListener((MapChangeListener<Integer, Collection>)(x) -> { 
-                Static.rebuildImageList();
-            
-                if (x.getValueRemoved() == defaultCollection) 
-                    defaultCollection = dictionary.values().iterator().next();
-            });
-        
-        return res;
-    }
+    public static int lastID;
     
-    public static ObservableMap<Integer, Collection> dictionary = initDictionary();
-    public static Collection defaultCollection;
-    private static int maxId = 0;
 }

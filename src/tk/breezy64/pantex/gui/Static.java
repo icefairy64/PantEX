@@ -5,8 +5,6 @@
  */
 package tk.breezy64.pantex.gui;
 
-import tk.breezy64.pantex.core.Collection;
-import tk.breezy64.pantex.core.EXImage;
 import com.sun.javafx.collections.ObservableListWrapper;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
@@ -24,15 +22,15 @@ import javafx.stage.FileChooser;
 public class Static {
     
     public static FileChooser.ExtensionFilter imageExtFilter = new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif");
-    public static ObservableList<EXImage> images = new ObservableListWrapper<>(new LinkedList<>());
+    public static ObservableList<FXImage> images = new ObservableListWrapper<>(new LinkedList<>());
     public static ExecutorService executor = Executors.newCachedThreadPool();
-    public static ObjectProperty<EXImage> currentImage = new SimpleObjectProperty<>();
+    public static ObjectProperty<FXImage> currentImage = new SimpleObjectProperty<>();
     
     public static void rebuildImageList() {
         Platform.runLater(() ->{
             images.clear();
 
-            for (Collection col : Collection.dictionary.values()) {
+            for (FXCollection col : FXCollection.dictionary.values()) {
                 images.addAll(col.images.values());
             }
         });

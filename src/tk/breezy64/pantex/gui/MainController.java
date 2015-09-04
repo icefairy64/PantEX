@@ -5,7 +5,7 @@
  */
 package tk.breezy64.pantex.gui;
 
-import tk.breezy64.pantex.core.Collection;
+import tk.breezy64.pantex.core.SimpleCollection;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.FileImage;
 import tk.breezy64.pantex.core.sources.DanbooruSource;
@@ -54,7 +54,7 @@ public class MainController implements Initializable {
     @FXML
     private MenuItem removeItemButton;
     @FXML
-    private ListView<EXImage> imagesList;
+    private ListView<FXImage> imagesList;
     @FXML
     private ImageView image;
     @FXML
@@ -86,9 +86,9 @@ public class MainController implements Initializable {
         imageBg.widthProperty().bind(imageScrollPane.widthProperty());
         imageBg.heightProperty().bind(imageScrollPane.heightProperty());
         
-        Static.currentImage.addListener((ChangeListener<EXImage>)(o, oV, nV) -> {
+        Static.currentImage.addListener((ChangeListener<FXImage>)(o, oV, nV) -> {
             indicateProgressStart();
-            Static.executor.submit(() -> { Image x = FXImage.fromEX(nV); onImageLoaded(x); });
+            Static.executor.submit(() -> { Image x = nV.get(); onImageLoaded(x); });
         });
     }    
 
@@ -103,7 +103,7 @@ public class MainController implements Initializable {
         dialog.setScene(dialogScene);
         dialog.showAndWait();
         
-        Collection col = (Collection)dialogScene.getUserData();
+        SimpleCollection col = (SimpleCollection)dialogScene.getUserData();
         if (col != null) {
             EXImage[] imgs = new EXImage[files.size()];
             for (int i = 0; i < imgs.length; i++) {
@@ -130,7 +130,7 @@ public class MainController implements Initializable {
     private void selectImage(MouseEvent event) {
         event.consume();
         if (event.getClickCount() == 2) {
-            EXImage img = imagesList.getSelectionModel().getSelectedItem();
+            FXImage img = imagesList.getSelectionModel().getSelectedItem();
             Static.currentImage.set(img);
         }
     }
@@ -162,7 +162,7 @@ public class MainController implements Initializable {
     private void onFetch(EXImage[] imgs) {
         indicateProgressEnd();
         for (EXImage img : imgs) {
-            img.collection = Collection.dictionary.get(0);
+            img.collection = SimpleCollection.dictionary.get(0);
             img.collection.addImage(img);
         }
         

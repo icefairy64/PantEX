@@ -6,10 +6,8 @@
 package tk.breezy64.pantex.gui;
 
 import com.sun.javafx.collections.ObservableListWrapper;
-import tk.breezy64.pantex.core.Collection;
-import tk.breezy64.pantex.core.EXImage;
+import tk.breezy64.pantex.core.SimpleCollection;
 import tk.breezy64.pantex.core.EXPack;
-import tk.breezy64.pantex.core.EXPackException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,9 +20,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
@@ -33,7 +29,6 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 /**
  * FXML Controller class
@@ -42,9 +37,9 @@ import javafx.stage.Stage;
  */
 public class CollectionsController implements Initializable {
     @FXML
-    private ListView<Collection> collectionsList;
+    private ListView<FXCollection> collectionsList;
     @FXML
-    private ListView<EXImage> imagesList;
+    private ListView<FXImage> imagesList;
     @FXML
     private ProgressIndicator progressIndicator;
     @FXML
@@ -55,14 +50,14 @@ public class CollectionsController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        collectionsList.getItems().addAll(Collection.dictionary.values());
+        collectionsList.getItems().addAll(FXCollection.dictionary.values());
         collectionsList.getSelectionModel().select(0);
         
         imagesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         imagesList.itemsProperty().bind(Bindings.createObjectBinding(() ->
                 new ObservableListWrapper<>(collectionsList.getSelectionModel().getSelectedItem().images.values().stream().collect(Collectors.toList())),
                 collectionsList.getSelectionModel().selectedItemProperty(), collectionsList.getSelectionModel().getSelectedItem().images));
-        imagesList.getSelectionModel().selectedItemProperty().addListener((ChangeListener<EXImage>)(x, oV, nV) -> 
+        imagesList.getSelectionModel().selectedItemProperty().addListener((ChangeListener<FXImage>)(x, oV, nV) -> 
                 Static.currentImage.set(nV));
     }    
 
@@ -87,7 +82,7 @@ public class CollectionsController implements Initializable {
     @FXML
     private void renameClick(ActionEvent event) {
         event.consume();
-        Collection col = collectionsList.getSelectionModel().getSelectedItem();
+        FXCollection col = collectionsList.getSelectionModel().getSelectedItem();
         TextInputDialog d = new TextInputDialog(col.title);
         d.setContentText("Enter new collection name:");
         d.showAndWait().ifPresent((x) -> col.title = x);
@@ -121,7 +116,8 @@ public class CollectionsController implements Initializable {
     
     private void load(File f) {
         try {
-            Collection col = EXPack.load(f);
+            FXCollection col = FXCollection.create("");
+            EXPack.load(f, col);
            
             Platform.runLater(() -> { indicateProgressEnd(); collectionsList.getItems().add(col); /*Static.rebuildImageList();*/ });
         }
@@ -136,17 +132,17 @@ public class CollectionsController implements Initializable {
 
     @FXML
     private void removeClick(ActionEvent event) {
-        Collection col = collectionsList.getSelectionModel().getSelectedItem();
+        FXCollection col = collectionsList.getSelectionModel().getSelectedItem();
         if (col != null) {
-            Collection.dictionary.remove(col.id);
+            SimpleCollection.dictionary.remove(col.id);
             collectionsList.getItems().remove(col);
         }
     }
 
     @FXML
     private void removeImagesClick(ActionEvent event) {
-        for (EXImage img : imagesList.getSelectionModel().getSelectedItems()) {
-            img.collection.removeImage(img);
+        for (FXImage img : imagesList.getSelectionModel().getSelectedItems()) {
+            img.getEXImage().collection.removeImage(img.getEXImage());
         }
         
         event.consume();
@@ -154,14 +150,14 @@ public class CollectionsController implements Initializable {
 
     @FXML
     private void moveImagesClick(ActionEvent event) throws IOException {
-        ChoiceDialog<Collection> dialog = new ChoiceDialog<>(Collection.defaultCollection, Collection.dictionary.values());
+        ChoiceDialog<FXCollection> dialog = new ChoiceDialog<>(FXCollection.defaultCollection, FXCollection.dictionary.values());
         dialog.setHeaderText("Choose a collection");
         dialog.setContentText("Collection:");
         
-        Optional<Collection> col = dialog.showAndWait();
+        Optional<FXCollection> col = dialog.showAndWait();
         col.ifPresent((x) ->
             imagesList.getSelectionModel().getSelectedItems().stream().forEach((img) -> 
-                    img.collection.moveImage(img, x)));
+                    img.getEXImage().collection.moveImage(img.getEXImage(), x)));
         
         event.consume();
     }
@@ -174,8 +170,8 @@ public class CollectionsController implements Initializable {
         if (dir != null) {
             imagesList.getSelectionModel().getSelectedItems().stream().forEach((img) -> {
                     try {
-                        FileOutputStream s = new FileOutputStream(new File(dir, img.title));
-                        img.writeImage(s);
+                        FileOutputStream s = new FileOutputStream(new File(dir, img.getEXImage().title));
+                        img.getEXImage().writeImage(s);
                         s.close();
                     }
                     catch (Exception e) {

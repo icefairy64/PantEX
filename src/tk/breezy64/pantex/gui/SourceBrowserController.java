@@ -5,7 +5,6 @@
  */
 package tk.breezy64.pantex.gui;
 
-import tk.breezy64.pantex.core.Collection;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.Util;
 import tk.breezy64.pantex.core.sources.ImageSource;
@@ -48,7 +47,7 @@ public class SourceBrowserController implements Initializable {
     @FXML
     private Rectangle shadeRect;
     @FXML
-    private ComboBox<Collection> collectionSelector;
+    private ComboBox<FXCollection> collectionSelector;
     @FXML
     private HBox rightHBox;
     @FXML
@@ -67,12 +66,12 @@ public class SourceBrowserController implements Initializable {
         shadeRect.widthProperty().bind(scrollPane.widthProperty());
         shadeRect.heightProperty().bind(scrollPane.heightProperty());
         try {
-            collectionSelector.getItems().addAll(Collection.dictionary.values());
+            collectionSelector.getItems().addAll(FXCollection.dictionary.values());
         }
         catch (Exception e) {
             Static.handleException(e);
         }
-        collectionSelector.getSelectionModel().select(Collection.dictionary.values().iterator().next());
+        collectionSelector.getSelectionModel().select(FXCollection.dictionary.values().iterator().next());
         rightHBox.prefWidthProperty().bind(bottomPanel.widthProperty().subtract(leftHBox.widthProperty()));
         
         thumbSize = new SimpleIntegerProperty(100);

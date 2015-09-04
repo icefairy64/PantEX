@@ -5,7 +5,6 @@
  */
 package tk.breezy64.pantex.gui;
 
-import tk.breezy64.pantex.core.Collection;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -21,7 +20,7 @@ import javafx.scene.control.ComboBox;
  */
 public class CollectionSelectorController implements Initializable {
     @FXML
-    private ComboBox<Collection> collectionSelector;
+    private ComboBox<FXCollection> collectionSelector;
     @FXML
     private Button okButton;
     @FXML
@@ -32,7 +31,7 @@ public class CollectionSelectorController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        collectionSelector.getItems().addAll(Collection.dictionary.values());
+        collectionSelector.getItems().addAll(FXCollection.dictionary.values());
     }    
 
     @FXML

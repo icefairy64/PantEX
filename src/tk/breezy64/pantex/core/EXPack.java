@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class EXPack {
     private static final byte[] signature = { 0x50, 0x41, 0x4e, 0x54, 0x53, 0x55, 0x45, 0x58 };
     private static final int separator = 0x00;
     
-    public static Collection load(File file) throws IOException, EXPackException {
+    public static Collection load(File file, Collection res) throws IOException, EXPackException {
         if (!file.exists() || !file.isFile()) {
             throw new FileNotFoundException(String.format("EXPack is not found at path %s", file.getPath()));
         }
@@ -44,7 +45,8 @@ public class EXPack {
         
         // Reading title
         String title = Util.readStr(f, separator);
-        Collection res = Collection.create(title);
+        res.title = title;
+        //DefaultCollection res = new DefaultCollection(title);
         
         // Reading tags
         int tagCount = Util.readInt(ch);
@@ -99,7 +101,7 @@ public class EXPack {
         out.write(signature);
         Util.writeStr(out, col.title, separator);
         
-        java.util.Collection<EXImage> imgs = col.images.values();
+        java.util.Collection<EXImage> imgs = Arrays.stream(col.getImages()).collect(Collectors.toList());
         List<Tag> tags = Tag.idMap.values().stream().filter((t) -> imgs.stream().anyMatch((i) -> i.tags.contains(t))).collect(Collectors.toList());
         Map<Tag, Integer> mtags = new HashMap<>();
         for (int i = 0; i < tags.size(); i++) {

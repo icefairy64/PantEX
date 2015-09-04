@@ -5,12 +5,9 @@
  */
 package tk.breezy64.pantex.gui;
 
-import tk.breezy64.pantex.core.Collection;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 /**
@@ -25,7 +22,7 @@ public class PantEX extends Application {
     public void init() throws Exception {
         super.init();
         
-        Collection.create("Temp");
+        FXCollection.create("Temp");
     }
     
     @Override
