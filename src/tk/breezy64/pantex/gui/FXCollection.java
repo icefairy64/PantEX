@@ -31,6 +31,7 @@ public class FXCollection extends Collection {
     @Override
     public void addImage(EXImage img) {
         images.put(maxImgId++, new FXImage(img));
+        img.id = maxImgId - 1;
     }
 
     @Override
@@ -44,7 +45,7 @@ public class FXCollection extends Collection {
             }
         }
         
-        images.remove(target);
+        images.remove(target.getEXImage().id);
     }
     
     @Override

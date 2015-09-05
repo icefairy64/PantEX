@@ -129,11 +129,11 @@ public class SourceBrowserController implements Initializable {
         view.fitWidthProperty().bind(thumbSize);
         view.fitHeightProperty().bind(thumbSize);
         view.setUserData(img);
+        view.setCache(true);
             
         view.setOnMouseClicked((e) -> {
             if (e.getClickCount() == 2) {
                 collectionSelector.getSelectionModel().getSelectedItem().addImage(img);
-                //Platform.runLater(() -> FXStatic.rebuildImageList());
             }
             e.consume();
         });

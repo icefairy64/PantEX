@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="vBox" prefHeight="486.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tk.breezy64.pantex.gui.MainController">
+<VBox fx:id="vBox" prefHeight="486.0" prefWidth="704.0" stylesheets="@default.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tk.breezy64.pantex.gui.MainController">
    <children>
       <MenuBar prefHeight="29.0" prefWidth="600.0">
         <menus>
@@ -37,16 +37,15 @@
                   </ListView>
                </children>
             </AnchorPane>
-            <ScrollPane fx:id="imageScrollPane" hbarPolicy="NEVER" pannable="true" prefViewportHeight="455.0" prefViewportWidth="522.0" vbarPolicy="NEVER">
+            <ScrollPane fx:id="imageScrollPane" hbarPolicy="NEVER" onScroll="#imageZoom" pannable="true" prefViewportHeight="455.0" prefViewportWidth="522.0" styleClass="background" vbarPolicy="NEVER">
                <content>
-                  <StackPane fx:id="imageStackPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="200.0">
+                  <StackPane fx:id="imageStackPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="200.0" styleClass="background">
                      <children>
-                        <Rectangle fx:id="imageBg" height="386.0" smooth="false" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="426.0" StackPane.alignment="TOP_LEFT" />
                         <HBox fx:id="imagePane" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="191.0" prefWidth="206.0">
                            <children>
                               <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                  <children>
-                                    <ImageView fx:id="image" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS" />
+                                    <ImageView fx:id="image" fitHeight="20.0" fitWidth="20.0" onScroll="#imageZoom" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS" />
                                  </children>
                               </VBox>
                            </children>

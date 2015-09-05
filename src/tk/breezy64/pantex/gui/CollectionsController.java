@@ -6,7 +6,6 @@
 package tk.breezy64.pantex.gui;
 
 import com.sun.javafx.collections.ObservableListWrapper;
-import tk.breezy64.pantex.core.SimpleCollection;
 import tk.breezy64.pantex.core.EXPack;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,7 +30,6 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import tk.breezy64.pantex.core.Collection;
 import tk.breezy64.pantex.core.Exporter;
 import tk.breezy64.pantex.core.Importer;
 import tk.breezy64.pantex.core.Static;
@@ -66,7 +64,7 @@ public class CollectionsController implements Initializable {
         imagesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         imagesList.itemsProperty().bind(Bindings.createObjectBinding(() ->
                 new ObservableListWrapper<>(collectionsList.getSelectionModel().getSelectedItem().images.values().stream().collect(Collectors.toList())),
-                collectionsList.getSelectionModel().selectedItemProperty(), collectionsList.getSelectionModel().getSelectedItem().images));
+                collectionsList.getSelectionModel().selectedItemProperty(), collectionsList.getSelectionModel().getSelectedItem().images, FXStatic.images));
         imagesList.getSelectionModel().selectedItemProperty().addListener((ChangeListener<FXImage>)(x, oV, nV) -> 
                 FXStatic.currentImage.set(nV));
         
@@ -98,6 +96,7 @@ public class CollectionsController implements Initializable {
                 FXStatic.executor.submit(() -> { 
                     try { 
                         x.afterExport((z) -> Platform.runLater(() -> indicateProgressEnd()))
+                                .onExportProgress((c, t) -> Platform.runLater(() -> progressIndicator.setProgress((double)c / t)))
                                 .export(collectionsList.getSelectionModel().getSelectedItem()); 
                     } 
                     catch (Exception e) { 
@@ -143,6 +142,7 @@ public class CollectionsController implements Initializable {
     }
     
     private void indicateProgressStart() {
+        progressIndicator.setProgress(0.0);
         progressIndicator.setVisible(true);
     }
     
@@ -160,6 +160,7 @@ public class CollectionsController implements Initializable {
         try {
             FXCollection col = FXCollection.create("");
             imp.afterImport((x) -> Platform.runLater(() -> { indicateProgressEnd(); collectionsList.getItems().add(col); }))
+                    .onImportProgress((c, t) -> Platform.runLater(() -> progressIndicator.setProgress((double)c / t)))
                     .load(col);
         }
         catch (Exception e) {

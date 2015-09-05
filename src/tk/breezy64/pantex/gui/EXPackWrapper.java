@@ -7,6 +7,7 @@ package tk.breezy64.pantex.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.stage.FileChooser;
@@ -27,6 +28,8 @@ public class EXPackWrapper implements Importer, Exporter {
     
     private Consumer<Collection> importHandler;
     private Consumer<Collection> exportHandler;
+    private BiConsumer<Integer, Integer> importProgressHandler;
+    private BiConsumer<Integer, Integer> exportProgressHandler;
     
     @Override
     public String getTitle() {
@@ -41,7 +44,7 @@ public class EXPackWrapper implements Importer, Exporter {
             FXStatic.executor.submit(() -> {
                 if (f != null) {
                     try {
-                        EXPack.loadCollection(f, col);
+                        EXPack.getInstance().load(f, col, importProgressHandler);
                         if (importHandler != null) {
                             importHandler.accept(col);
                         }
@@ -62,7 +65,7 @@ public class EXPackWrapper implements Importer, Exporter {
             FXStatic.executor.submit(() -> {
                 if (f != null) {
                     try {
-                        EXPack.writeCollection(col, f);
+                        EXPack.getInstance().write(col, f, exportProgressHandler);
                         if (exportHandler != null) {
                             exportHandler.accept(col);
                         }
@@ -84,6 +87,18 @@ public class EXPackWrapper implements Importer, Exporter {
     @Override
     public Exporter afterExport(Consumer<Collection> handler) {
         exportHandler = handler;
+        return this;
+    }
+
+    @Override
+    public Importer onImportProgress(BiConsumer<Integer, Integer> handler) {
+        importProgressHandler = handler;
+        return this;
+    }
+
+    @Override
+    public Exporter onExportProgress(BiConsumer<Integer, Integer> handler) {
+        exportProgressHandler = handler;
         return this;
     }
     

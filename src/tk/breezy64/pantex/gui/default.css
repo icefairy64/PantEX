@@ -1,0 +1,27 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Sep 6, 2015, 12:01:21 AM
+    Author     : icefairy64
+*/
+
+@font-face {
+    font-family: "Fira Sans Book";
+    src: url('FiraSans-Book.otf');
+}
+
+* {
+    -fx-font-family: "Fira Sans Book";
+}
+
+//.menu-bar {
+//    -fx-background-color: linear-gradient(to bottom, #4d4d50, #3d3d48);
+//    -fx-text-fill: seashell;
+//}
+
+.background {
+    -fx-background-color: black;
+}

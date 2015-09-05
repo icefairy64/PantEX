@@ -10,6 +10,7 @@ import com.google.gson.JsonParser;
 import com.yandex.disk.rest.Credentials;
 import com.yandex.disk.rest.ResourcesArgs;
 import com.yandex.disk.rest.RestClient;
+import com.yandex.disk.rest.exceptions.ServerException;
 import com.yandex.disk.rest.json.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,6 +77,8 @@ public class YandexDiskPlugin extends Plugin {
         
         private Optional<Consumer<Collection>> importHandler = Optional.empty();
         private Optional<Consumer<Collection>> exportHandler = Optional.empty();
+        private Optional<BiConsumer<Integer, Integer>> importProgressHandler = Optional.empty();
+        private Optional<BiConsumer<Integer, Integer>> exportProgressHandler = Optional.empty();
 
         @Override
         public String getTitle() {
@@ -104,7 +108,7 @@ public class YandexDiskPlugin extends Plugin {
                     YandexToken token = auth.getOrCreateToken();
                     if (token != null) {
                         RestClient client = new RestClient(new Credentials(token.getUid(), token.getToken()));
-                        
+
                         // Getting list of directories
                         Resource res = client.getResources(new ResourcesArgs.Builder().setLimit(collectionLimit).setPath("app:/").build());
                         List<String> dirs = res.getResourceList().getItems()
@@ -112,30 +116,34 @@ public class YandexDiskPlugin extends Plugin {
                                 .filter((x) -> x.isDir())
                                 .map((x) -> x.getName())
                                 .collect(Collectors.toList());
-                        
+
                         // Choosing directory
                         ChoiceDialog<String> dialog = new ChoiceDialog<>(dirs.get(0), dirs);
                         Optional<String> r = dialog.showAndWait();
                         
-                        // Loading
-                        if (r.isPresent()) {
-                            col.title = r.get();
-                            String path = "app:/" + r.get() + "/collection.json";
-                            JSONPack.load(col, new InputStreamReader(getFileStream(path, token)), 
-                                    (title) -> {
-                                        EXImage img = new RemoteImage(getFileUrl("app:/" + r.get() + "/" + title, token), col, null);
-                                        img.title = title;
-                                        return img;
-                                    });
-                        } else {
-                            throw new ExportException("Failed to request a collection");
-                        }
-                        
-                        String path = "app:/" + col.title;
+                        FXStatic.executor.submit(() -> {
+                            try {
+                                // Loading
+                                if (r.isPresent()) {
+                                    col.title = r.get();
+                                    String path = "app:/" + r.get() + "/collection.json";
+                                    JSONPack.load(col, new InputStreamReader(getFileStream(path, token)),
+                                            (title) -> {
+                                                EXImage img = new RemoteImage(getFileUrl("app:/" + r.get() + "/" + title, token), col, null);
+                                                img.title = title;
+                                                return img;
+                                            }, importProgressHandler.orElse(null));
+                                } else {
+                                    throw new ExportException("Failed to request a collection");
+                                }
+                            } catch (Exception e) {
+                                FXStatic.handleException(e);
+                            }
+                            importHandler.ifPresent((x) -> x.accept(col));
+                        });
                     } else {
                         throw new ExportException("Failed to request a token");
                     }
-                    importHandler.ifPresent((x) -> x.accept(col));
                 }
                 catch (Exception e) {
                     FXStatic.handleException(e);
@@ -150,34 +158,45 @@ public class YandexDiskPlugin extends Plugin {
                 try {
                     YandexToken token = auth.getOrCreateToken();
                     if (token != null) {
-                        RestClient client = new RestClient(new Credentials(token.getUid(), token.getToken()));
-                        String path = "app:/" + col.title;
-                        if (!client.getResources(new ResourcesArgs.Builder().setPath("app:/").setLimit(collectionLimit).build()).getResourceList().getItems().stream().anyMatch((x) -> x.getName().equals(col.title))) {
-                            client.makeFolder(path);
-                        }
-                        
-                        File j = File.createTempFile("PantEX", ".json");
-                        j.deleteOnExit();
-                        JSONPack.write(col, new FileWriter(j), (x) -> {
+                        FXStatic.executor.submit(() -> {
                             try {
-                                File f = File.createTempFile("PantEX", "_" + x.title);
-                                f.deleteOnExit();
-                                FileOutputStream w = new FileOutputStream(f);
-                                x.writeImage(w);
-                                w.close();
-                                client.uploadFile(client.getUploadLink(path + "/" + x.title, false), true, f, null);
-                                f.delete();
+                                RestClient client = new RestClient(new Credentials(token.getUid(), token.getToken()));
+                                String path = "app:/" + col.title;
+                                if (!client.getResources(new ResourcesArgs.Builder().setPath("app:/").setLimit(collectionLimit).build()).getResourceList().getItems().stream().anyMatch((x) -> x.getName().equals(col.title))) {
+                                    client.makeFolder(path);
+                                }
+
+                                File j = File.createTempFile("PantEX", ".json");
+                                j.deleteOnExit();
+                                JSONPack.write(col, new FileWriter(j), (x) -> {
+                                    try {
+                                        File f = File.createTempFile("PantEX", "_" + x.title);
+                                        f.deleteOnExit();
+                                        FileOutputStream w = new FileOutputStream(f);
+                                        x.writeImage(w);
+                                        w.close();
+                                        try {
+                                            client.uploadFile(client.getUploadLink(path + "/" + x.title, false), true, f, null);
+                                        }
+                                        catch (ServerException e) {
+                                        }
+                                        f.delete();
+                                    }
+                                    catch (Exception e) {
+                                        FXStatic.handleException(e);
+                                    }
+                                }, exportProgressHandler.orElse(null));
+                                client.uploadFile(client.getUploadLink(path + "/collection.json", true), true, j, null);
+                                j.delete();
                             }
                             catch (Exception e) {
                                 FXStatic.handleException(e);
                             }
+                            exportHandler.ifPresent((x) -> x.accept(col));
                         });
-                        client.uploadFile(client.getUploadLink(path + "/collection.json", false), true, j, null);
-                        j.delete();
                     } else {
                         throw new ExportException("Failed to request a token");
                     }
-                    exportHandler.ifPresent((x) -> x.accept(col));
                 } catch (Exception e) {
                     FXStatic.handleException(e);
                 }
@@ -195,6 +214,19 @@ public class YandexDiskPlugin extends Plugin {
             exportHandler = Optional.of(handler);
             return this;
         }
+
+        @Override
+        public Importer onImportProgress(BiConsumer<Integer, Integer> handler) {
+            importProgressHandler = handler == null ? Optional.empty() : Optional.of(handler);
+            return this;
+        }
+
+        @Override
+        public Exporter onExportProgress(BiConsumer<Integer, Integer> handler) {
+            exportProgressHandler = handler == null ? Optional.empty() : Optional.of(handler);
+            return this;
+        }
+
     }
 
     /**

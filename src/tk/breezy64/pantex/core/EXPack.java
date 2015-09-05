@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -31,7 +32,7 @@ public class EXPack {
     }
     
     //@Override
-    public void load(File file, Collection res) throws IOException, ImportException {
+    public void load(File file, Collection res, BiConsumer<Integer, Integer> progressHandler) throws IOException, ImportException {
         if (!file.exists() || !file.isFile()) {
             throw new FileNotFoundException(String.format("EXPack is not found at path %s", file.getPath()));
         }
@@ -78,6 +79,10 @@ public class EXPack {
             
             // Title
             imgTitles[i] = Util.readStr(f, separator);
+            
+            if (progressHandler != null) {
+                progressHandler.accept(i + 1, imgCount);
+            }
         }
         
         // Creating images
@@ -91,7 +96,7 @@ public class EXPack {
         }
     }
     
-    public void write(Collection col, File file) throws IOException {
+    public void write(Collection col, File file, BiConsumer<Integer, Integer> progressHandler) throws IOException {
         FileOutputStream out = new FileOutputStream(file);
         FileChannel ch = out.getChannel();
         
@@ -111,6 +116,7 @@ public class EXPack {
         }
         
         Util.writeInt(ch, imgs.size());
+        int i = 0;
         for (EXImage img : imgs) {
             Util.writeInt(ch, img.getImageSize());
             
@@ -122,6 +128,9 @@ public class EXPack {
             }
             
             Util.writeStr(out, img.title, separator);
+            if (progressHandler != null) {
+                progressHandler.accept(++i, imgs.size());
+            }
         }
         
         for (EXImage img : imgs) {
@@ -138,7 +147,7 @@ public class EXPack {
     private static EXPack instance = new EXPack();
     
     public static void loadCollection(File file, Collection res) throws IOException, ImportException {
-        instance.load(file, res);
+        instance.load(file, res, null);
     }
     
     public static EXPack getInstance() {
@@ -146,7 +155,7 @@ public class EXPack {
     }
     
     public static void writeCollection(Collection res, File file) throws IOException {
-        instance.write(res, file);
+        instance.write(res, file, null);
     }
     
     private static boolean checkSignature(InputStream s) throws IOException {

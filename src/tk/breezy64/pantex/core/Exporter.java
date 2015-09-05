@@ -7,6 +7,7 @@ package tk.breezy64.pantex.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import ro.fortsoft.pf4j.ExtensionPoint;
 
@@ -17,6 +18,7 @@ import ro.fortsoft.pf4j.ExtensionPoint;
 public interface Exporter extends ExtensionPoint {
     
     public String getTitle();
+    public Exporter onExportProgress(BiConsumer<Integer, Integer> handler);
     public void export(Collection col) throws IOException, ExportException;
     public Exporter afterExport(Consumer<Collection> handler);
     

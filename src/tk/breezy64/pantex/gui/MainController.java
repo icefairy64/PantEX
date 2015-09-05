@@ -18,6 +18,8 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,6 +37,7 @@ import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -42,7 +45,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import tk.breezy64.pantex.core.Collection;
-import tk.breezy64.pantex.core.ConfigManager;
 import tk.breezy64.pantex.core.Static;
 import tk.breezy64.pantex.core.sources.ImageSource;
 import tk.breezy64.pantex.core.sources.ImageSourceRequester;
@@ -55,6 +57,7 @@ import tk.breezy64.pantex.core.sources.ImageSourceRequester;
 public class MainController implements Initializable {
     
     private DanbooruSource danbooru = new DanbooruSource();
+    private DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
     
     @FXML
     private MenuItem addImagesButton;
@@ -70,8 +73,6 @@ public class MainController implements Initializable {
     private HBox imagePane;
     @FXML
     private ProgressIndicator loadingIndicator;
-    @FXML
-    private Rectangle imageBg;
     @FXML
     private VBox vBox;
     @FXML
@@ -92,10 +93,14 @@ public class MainController implements Initializable {
         imageStackPane.prefHeightProperty().bind(imageScrollPane.heightProperty());
         imagePane.prefWidthProperty().bind(imageScrollPane.widthProperty());
         imagePane.prefHeightProperty().bind(imageScrollPane.heightProperty());
-        image.fitWidthProperty().bind(imageScrollPane.widthProperty());
-        image.fitHeightProperty().bind(imageScrollPane.heightProperty());
-        imageBg.widthProperty().bind(imageScrollPane.widthProperty());
-        imageBg.heightProperty().bind(imageScrollPane.heightProperty());
+        image.fitWidthProperty().bind(imageScrollPane.widthProperty().multiply(zoomFactor));
+        image.fitHeightProperty().bind(imageScrollPane.heightProperty().multiply(zoomFactor));
+        
+        zoomFactor.addListener((x, oV, nV) -> {
+            double delta = nV.doubleValue() / oV.doubleValue();
+            imageScrollPane.setVvalue(imageScrollPane.getVvalue() * delta);
+            imageScrollPane.setHvalue(imageScrollPane.getHvalue() * delta);
+        });
         
         FXStatic.currentImage.addListener((ChangeListener<FXImage>)(o, oV, nV) -> {
             indicateProgressStart();
@@ -137,6 +142,8 @@ public class MainController implements Initializable {
 
     @FXML
     private void removeItem(ActionEvent event) {
+        FXImage img = imagesList.getSelectionModel().getSelectedItem();
+        img.getEXImage().collection.removeImage(img.getEXImage());
     }
 
     @FXML
@@ -150,6 +157,7 @@ public class MainController implements Initializable {
     
     private void onImageLoaded(Image img) {
         indicateProgressEnd();
+        zoomFactor.set(1.0);
         image.setImage(img);
         image.setFitWidth(image.getParent().getBoundsInLocal().getWidth());
         image.setFitHeight(image.getParent().getBoundsInLocal().getHeight());
@@ -217,6 +225,12 @@ public class MainController implements Initializable {
         }
         
         Platform.runLater(() -> sourcesMenu.getItems().addAll(catList));
+    }
+
+    @FXML
+    private void imageZoom(ScrollEvent event) {
+        zoomFactor.set(zoomFactor.get() + zoomFactor.get() * 0.2 * Math.signum(event.getDeltaY()));
+        event.consume();
     }
     
 }

@@ -5,3 +5,5 @@
 /YandexDisk/dist/
 /plugins/
 /config.json
+/src/tk/breezy64/pantex/gui/*.otf
+**/*.log
