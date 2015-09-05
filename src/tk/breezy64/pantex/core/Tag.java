@@ -6,9 +6,6 @@
 package tk.breezy64.pantex.core;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +20,11 @@ public class Tag {
         this.id = id;
         this.title = title.toLowerCase();
     }
+
+    @Override
+    public String toString() {
+        return title;
+    }
     
     public static Tag create(String title) {
         Tag tag = new Tag(maxId++, title);
@@ -31,6 +33,10 @@ public class Tag {
         tagMap.put(tag.title, tag);
         
         return tag;
+    }
+    
+    public static Tag getOrCreate(String title) {
+        return tagMap.containsKey(title) ? tagMap.get(title) : create(title);
     }
     
     public static Map<Integer, Tag> idMap = new HashMap<>();

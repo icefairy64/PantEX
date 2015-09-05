@@ -34,6 +34,7 @@ import javafx.stage.FileChooser;
 import tk.breezy64.pantex.core.Collection;
 import tk.breezy64.pantex.core.Exporter;
 import tk.breezy64.pantex.core.Importer;
+import tk.breezy64.pantex.core.Static;
 
 /**
  * FXML Controller class
@@ -67,7 +68,7 @@ public class CollectionsController implements Initializable {
                 new ObservableListWrapper<>(collectionsList.getSelectionModel().getSelectedItem().images.values().stream().collect(Collectors.toList())),
                 collectionsList.getSelectionModel().selectedItemProperty(), collectionsList.getSelectionModel().getSelectedItem().images));
         imagesList.getSelectionModel().selectedItemProperty().addListener((ChangeListener<FXImage>)(x, oV, nV) -> 
-                Static.currentImage.set(nV));
+                FXStatic.currentImage.set(nV));
         
         // Filling import/export buttons
         
@@ -84,7 +85,7 @@ public class CollectionsController implements Initializable {
         MenuItem item = new MenuItem(x.getTitle());
             item.setOnAction((ev) -> {
                 indicateProgressStart();
-                Static.executor.submit(() -> load(x));
+                FXStatic.executor.submit(() -> load(x));
                 ev.consume();
             });
             return item;
@@ -94,14 +95,14 @@ public class CollectionsController implements Initializable {
         MenuItem item = new MenuItem(x.getTitle());
             item.setOnAction((ev) -> {
                 indicateProgressStart();
-                Static.executor.submit(() -> { 
+                FXStatic.executor.submit(() -> { 
                     try { 
-                        x.export(collectionsList.getSelectionModel().getSelectedItem()); 
+                        x.afterExport((z) -> Platform.runLater(() -> indicateProgressEnd()))
+                                .export(collectionsList.getSelectionModel().getSelectedItem()); 
                     } 
                     catch (Exception e) { 
-                        Static.handleException(e); 
+                        FXStatic.handleException(e); 
                     } 
-                    Platform.runLater(() -> indicateProgressEnd()); 
                 });
                 ev.consume();
             });
@@ -114,7 +115,7 @@ public class CollectionsController implements Initializable {
         File f = ch.showSaveDialog(imagesList.getScene().getWindow());
         
         indicateProgressStart();
-        Static.executor.submit(() -> { 
+        FXStatic.executor.submit(() -> { 
             try { 
                 EXPack.writeCollection(collectionsList.getSelectionModel().getSelectedItem(), f); 
             } 
@@ -152,7 +153,7 @@ public class CollectionsController implements Initializable {
     private void importClick(ActionEvent event) {
         event.consume();
         indicateProgressStart();
-        Static.executor.submit(() -> load(EXPackWrapper.getInstance()));
+        FXStatic.executor.submit(() -> load(EXPackWrapper.getInstance()));
     }
     
     private void load(Importer imp) {
@@ -162,7 +163,7 @@ public class CollectionsController implements Initializable {
                     .load(col);
         }
         catch (Exception e) {
-            Static.handleException(e);
+            FXStatic.handleException(e);
         }
     }
 
@@ -174,7 +175,7 @@ public class CollectionsController implements Initializable {
     private void removeClick(ActionEvent event) {
         FXCollection col = collectionsList.getSelectionModel().getSelectedItem();
         if (col != null) {
-            SimpleCollection.dictionary.remove(col.id);
+            FXCollection.dictionary.remove(col.id);
             collectionsList.getItems().remove(col);
         }
     }
@@ -215,7 +216,7 @@ public class CollectionsController implements Initializable {
                         s.close();
                     }
                     catch (Exception e) {
-                        Static.handleException(e);
+                        FXStatic.handleException(e);
                     }
                 });
         }

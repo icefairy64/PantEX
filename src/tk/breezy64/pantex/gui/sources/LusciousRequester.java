@@ -16,7 +16,7 @@ import ro.fortsoft.pf4j.Extension;
 import tk.breezy64.pantex.core.sources.ImageSourceRequester;
 import tk.breezy64.pantex.core.sources.LusciousCategory;
 import tk.breezy64.pantex.core.sources.LusciousSource;
-import tk.breezy64.pantex.gui.Static;
+import tk.breezy64.pantex.gui.FXStatic;
 
 /**
  *

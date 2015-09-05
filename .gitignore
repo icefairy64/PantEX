@@ -1,1 +1,7 @@
 /libs/
+/YandexDisk/nbproject/private/
+/YandexDisk/lib/
+/YandexDisk/build/
+/YandexDisk/dist/
+/plugins/
+/config.json

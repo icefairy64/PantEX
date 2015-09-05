@@ -7,13 +7,16 @@ package tk.breezy64.pantex.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.Header;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 
 /**
  *
@@ -22,7 +25,6 @@ import org.apache.http.impl.client.HttpClients;
 public final class Util {
     
     private static final ByteBuffer intBuf = ByteBuffer.allocate(4);
-    
     private static final int bufferSize = 4096;
     
     public static final String userAgent = "Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0";
@@ -76,12 +78,29 @@ public final class Util {
             read += len;
         }
     }
+    
+    public static String readStream(InputStream in) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        InputStreamReader r = new InputStreamReader(in);
+        char[] buf = new char[bufferSize];
+        int len = 0;
+        
+        while ((len = r.read(buf)) >= 0) {
+            sb.append(buf);
+        }
+        
+        in.close();
+        return sb.toString();
+    }
 
-    public static InputStream fetchStream(String url) {
+    public static InputStream fetchStream(String url, String[]... headers) {
         try {
             CloseableHttpClient hc = HttpClients.createDefault();
             HttpGet hr = new HttpGet(url);
             hr.addHeader("User-Agent", Util.userAgent);
+            for (String[] h : headers) {
+                hr.addHeader(new BasicHeader(h[0], h[1]));
+            }
             CloseableHttpResponse resp = hc.execute(hr);
             InputStream in = resp.getEntity().getContent();
             return in;
@@ -90,10 +109,10 @@ public final class Util {
         }
     }
 
-    public static String fetch(String url) {
+    public static String fetch(String url, String[]... headers) {
         StringBuilder sb = new StringBuilder();
         try {
-            InputStream in = Util.fetchStream(url);
+            InputStream in = Util.fetchStream(url, headers);
             int len = 0;
             byte[] buf = new byte[bufferSize];
             while ((len = in.read(buf)) > 0) {

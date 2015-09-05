@@ -25,7 +25,7 @@ public class FXCollection extends Collection {
         super(title);
         this.images = new ObservableMapWrapper<>(new LinkedHashMap<Integer, FXImage>());
         this.images.addListener((MapChangeListener<Integer, FXImage>)(x) ->
-                Static.rebuildImageList());
+                FXStatic.rebuildImageList());
     }
 
     @Override
@@ -56,7 +56,7 @@ public class FXCollection extends Collection {
         ObservableMap<Integer, FXCollection> res = new ObservableMapWrapper<>(new LinkedHashMap<>());
         res.addListener((MapChangeListener<Integer, FXCollection>)(x) -> { 
                 if (x.getValueRemoved() != null)    
-                    Static.rebuildImageList();
+                    FXStatic.rebuildImageList();
             
                 if (x.getValueRemoved() == defaultCollection) 
                     defaultCollection = dictionary.values().iterator().next();

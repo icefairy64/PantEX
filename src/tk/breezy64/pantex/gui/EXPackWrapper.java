@@ -38,7 +38,7 @@ public class EXPackWrapper implements Importer, Exporter {
         FileChooser ch = new FileChooser();
         Platform.runLater(() -> {
             File f = ch.showOpenDialog(null);
-            Static.executor.submit(() -> {
+            FXStatic.executor.submit(() -> {
                 if (f != null) {
                     try {
                         EXPack.loadCollection(f, col);
@@ -47,7 +47,7 @@ public class EXPackWrapper implements Importer, Exporter {
                         }
                     }
                     catch (Exception e) {
-                        Static.handleException(e);
+                        FXStatic.handleException(e);
                     }
                 }
             });
@@ -59,7 +59,7 @@ public class EXPackWrapper implements Importer, Exporter {
         FileChooser ch = new FileChooser();
         Platform.runLater(() -> {
             File f = ch.showSaveDialog(null);
-            Static.executor.submit(() -> {
+            FXStatic.executor.submit(() -> {
                 if (f != null) {
                     try {
                         EXPack.writeCollection(col, f);
@@ -68,7 +68,7 @@ public class EXPackWrapper implements Importer, Exporter {
                         }
                     }
                     catch (Exception e) {
-                        Static.handleException(e);
+                        FXStatic.handleException(e);
                     }
                 }
             });
@@ -87,7 +87,7 @@ public class EXPackWrapper implements Importer, Exporter {
         return this;
     }
     
-    // Static
+    // FXStatic
     
     private final static EXPackWrapper instance = new EXPackWrapper();
 

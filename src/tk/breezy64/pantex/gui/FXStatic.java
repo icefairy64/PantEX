@@ -21,13 +21,12 @@ import ro.fortsoft.pf4j.PluginManager;
  *
  * @author icefairy64
  */
-public class Static {
+public class FXStatic {
     
     public static FileChooser.ExtensionFilter imageExtFilter = new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif");
     public static ObservableList<FXImage> images = new ObservableListWrapper<>(new LinkedList<>());
     public static ExecutorService executor = Executors.newCachedThreadPool();
     public static ObjectProperty<FXImage> currentImage = new SimpleObjectProperty<>();
-    public static PluginManager pluginManager = createPluginManager();
     
     public static void rebuildImageList() {
         Platform.runLater(() ->{
@@ -39,10 +38,6 @@ public class Static {
         });
     }
     
-    public static PluginManager createPluginManager() {
-        PluginManager pm = new DefaultPluginManager();
-        return pm;
-    }
     
     public static void handleException(Throwable e) {
         e.printStackTrace();

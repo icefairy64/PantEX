@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
@@ -22,6 +24,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -38,6 +41,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import tk.breezy64.pantex.core.Collection;
+import tk.breezy64.pantex.core.ConfigManager;
+import tk.breezy64.pantex.core.Static;
 import tk.breezy64.pantex.core.sources.ImageSource;
 import tk.breezy64.pantex.core.sources.ImageSourceRequester;
 
@@ -80,7 +86,7 @@ public class MainController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        imagesList.setItems(Static.images);
+        imagesList.setItems(FXStatic.images);
         imagesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         imageStackPane.prefWidthProperty().bind(imageScrollPane.widthProperty());
         imageStackPane.prefHeightProperty().bind(imageScrollPane.heightProperty());
@@ -91,9 +97,9 @@ public class MainController implements Initializable {
         imageBg.widthProperty().bind(imageScrollPane.widthProperty());
         imageBg.heightProperty().bind(imageScrollPane.heightProperty());
         
-        Static.currentImage.addListener((ChangeListener<FXImage>)(o, oV, nV) -> {
+        FXStatic.currentImage.addListener((ChangeListener<FXImage>)(o, oV, nV) -> {
             indicateProgressStart();
-            Static.executor.submit(() -> { Image x = nV.get(); onImageLoaded(x); });
+            FXStatic.executor.submit(() -> { Image x = nV.get(); onImageLoaded(x); });
         });
         
         refreshSources();
@@ -102,26 +108,26 @@ public class MainController implements Initializable {
     @FXML
     private void addImages(ActionEvent event) throws Exception {
         FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().add(Static.imageExtFilter);
+        chooser.getExtensionFilters().add(FXStatic.imageExtFilter);
         List<File> files = chooser.showOpenMultipleDialog(PantEX.stage);
         
-        Scene dialogScene = new Scene(FXMLLoader.load(getClass().getResource("CollectionSelectorDialog.fxml")));
-        Stage dialog = new Stage();
-        dialog.setScene(dialogScene);
-        dialog.showAndWait();
+        ChoiceDialog<Collection> dialog = new ChoiceDialog<>(FXCollection.defaultCollection, FXCollection.dictionary.values().stream().collect(Collectors.toList()));
+        dialog.setTitle("Collection");
+        dialog.setHeaderText("Choose a collection");
+        dialog.setContentText("Select:");
+        Optional<Collection> col = dialog.showAndWait();
         
-        SimpleCollection col = (SimpleCollection)dialogScene.getUserData();
-        if (col != null) {
+        if (col.isPresent()) {
             EXImage[] imgs = new EXImage[files.size()];
             for (int i = 0; i < imgs.length; i++) {
-                imgs[i] = new FileImage(files.get(i).getPath(), col, files.get(i).getName(), null);
+                imgs[i] = new FileImage(files.get(i).getPath(), col.get(), files.get(i).getName(), null);
             }
-            col.addImages(imgs);
+            col.get().addImages(imgs);
             
             //Static.rebuildImageList();
         }
         
-        dialog.close();
+        event.consume();
     }
 
     @FXML
@@ -138,7 +144,7 @@ public class MainController implements Initializable {
         event.consume();
         if (event.getClickCount() == 2) {
             FXImage img = imagesList.getSelectionModel().getSelectedItem();
-            Static.currentImage.set(img);
+            FXStatic.currentImage.set(img);
         }
     }
     
@@ -161,7 +167,7 @@ public class MainController implements Initializable {
     
     private void fetchDanbooru(ActionEvent event) {
         indicateProgressStart();
-        Static.executor.submit(() -> onFetch(danbooru.next()));
+        FXStatic.executor.submit(() -> onFetch(danbooru.next()));
         event.consume();
     }
     
@@ -172,7 +178,7 @@ public class MainController implements Initializable {
             img.collection.addImage(img);
         }
         
-        //Platform.runLater(() -> Static.rebuildImageList());
+        //Platform.runLater(() -> FXStatic.rebuildImageList());
     }
     
     private void showSourceBrowser(ImageSource src) {
@@ -185,7 +191,7 @@ public class MainController implements Initializable {
             browser.show();
         }
         catch (Exception e) {
-            Static.handleException(e);
+            FXStatic.handleException(e);
         }
     }
     

@@ -69,7 +69,7 @@ public class SourceBrowserController implements Initializable {
             collectionSelector.getItems().addAll(FXCollection.dictionary.values());
         }
         catch (Exception e) {
-            Static.handleException(e);
+            FXStatic.handleException(e);
         }
         collectionSelector.getSelectionModel().select(FXCollection.dictionary.values().iterator().next());
         rightHBox.prefWidthProperty().bind(bottomPanel.widthProperty().subtract(leftHBox.widthProperty()));
@@ -85,7 +85,7 @@ public class SourceBrowserController implements Initializable {
         }
         
         indicateProgressStart();
-        Static.executor.submit(() -> fetch());
+        FXStatic.executor.submit(() -> fetch());
     }
     
     private void fetch() {
@@ -96,11 +96,11 @@ public class SourceBrowserController implements Initializable {
             }
 
             for (EXImage img : imgs) {
-                Static.executor.submit(() -> fetchImage(img));
+                FXStatic.executor.submit(() -> fetchImage(img));
             }
         }
         catch (Exception e) {
-            Static.handleException(e);
+            FXStatic.handleException(e);
         }
         
         indicateProgressEnd();
@@ -133,7 +133,7 @@ public class SourceBrowserController implements Initializable {
         view.setOnMouseClicked((e) -> {
             if (e.getClickCount() == 2) {
                 collectionSelector.getSelectionModel().getSelectedItem().addImage(img);
-                //Platform.runLater(() -> Static.rebuildImageList());
+                //Platform.runLater(() -> FXStatic.rebuildImageList());
             }
             e.consume();
         });

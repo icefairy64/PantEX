@@ -18,7 +18,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tk.breezy64.pantex.gui.SourceBrowserController;
-import tk.breezy64.pantex.gui.Static;
+import tk.breezy64.pantex.gui.FXStatic;
 
 /**
  * FXML Controller class
@@ -54,7 +54,7 @@ public class LusciousOptionsController implements Initializable {
             browser.show();
             browser.toFront();
             
-            Static.executor.submit(() -> {
+            FXStatic.executor.submit(() -> {
                 synchronized (flag) {
                     flag.notifyAll();
                 }

@@ -5,16 +5,22 @@
  */
 package tk.breezy64.pantex.gui;
 
+import java.io.File;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import tk.breezy64.pantex.core.ConfigManager;
+import tk.breezy64.pantex.core.Static;
 
 /**
  *
  * @author icefairy64
  */
 public class PantEX extends Application {
+    
+    public final static String configFile = "config.json";
     
     public static Stage stage;
 
@@ -25,6 +31,7 @@ public class PantEX extends Application {
         FXCollection.create("Temp");
         Static.pluginManager.loadPlugins();
         Static.pluginManager.startPlugins();
+        ConfigManager.load(new File(configFile));  
     }
     
     @Override
@@ -39,7 +46,8 @@ public class PantEX extends Application {
 
     @Override
     public void stop() throws Exception {
-        Static.executor.shutdown();
+        ConfigManager.save(new File(configFile));
+        FXStatic.executor.shutdown();
         super.stop();
     }
 
