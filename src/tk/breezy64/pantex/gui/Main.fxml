@@ -22,7 +22,7 @@
             <Menu fx:id="sourcesMenu" mnemonicParsing="false" text="Sources" />
         </menus>
       </MenuBar>
-      <SplitPane dividerPositions="0.25" prefHeight="372.0" prefWidth="600.0" VBox.vgrow="SOMETIMES">
+      <SplitPane dividerPositions="0.4601139601139601" prefHeight="372.0" prefWidth="600.0" VBox.vgrow="SOMETIMES">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
                <children>
@@ -37,24 +37,24 @@
                   </ListView>
                </children>
             </AnchorPane>
-            <ScrollPane fx:id="imageScrollPane" hbarPolicy="NEVER" onScroll="#imageZoom" pannable="true" prefViewportHeight="455.0" prefViewportWidth="522.0" styleClass="background" vbarPolicy="NEVER">
-               <content>
-                  <StackPane fx:id="imageStackPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="150.0" prefWidth="200.0" styleClass="background">
-                     <children>
-                        <HBox fx:id="imagePane" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="191.0" prefWidth="206.0">
+            <StackPane fx:id="imageStackPane">
+               <children>
+                  <ScrollPane fx:id="imageScrollPane" hbarPolicy="NEVER" onScroll="#imageZoom" pannable="true" prefHeight="375.0" prefViewportHeight="455.0" prefViewportWidth="522.0" prefWidth="375.0" styleClass="background" vbarPolicy="NEVER">
+                     <content>
+                        <HBox fx:id="imagePane" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="191.0" prefWidth="206.0" styleClass="background">
                            <children>
-                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" styleClass="background">
                                  <children>
                                     <ImageView fx:id="image" fitHeight="20.0" fitWidth="20.0" onScroll="#imageZoom" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS" />
                                  </children>
                               </VBox>
                            </children>
                         </HBox>
-                        <ProgressIndicator fx:id="loadingIndicator" maxHeight="64.0" maxWidth="64.0" prefHeight="64.0" prefWidth="64.0" visible="false" />
-                     </children>
-                  </StackPane>
-               </content>
-            </ScrollPane>
+                     </content>
+                  </ScrollPane>
+                  <ProgressIndicator fx:id="loadingIndicator" maxHeight="64.0" maxWidth="64.0" prefHeight="64.0" prefWidth="64.0" visible="false" />
+               </children>
+            </StackPane>
         </items>
       </SplitPane>
    </children>

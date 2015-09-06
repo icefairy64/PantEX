@@ -89,8 +89,8 @@ public class MainController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         imagesList.setItems(FXStatic.images);
         imagesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        imageStackPane.prefWidthProperty().bind(imageScrollPane.widthProperty());
-        imageStackPane.prefHeightProperty().bind(imageScrollPane.heightProperty());
+        imageScrollPane.prefWidthProperty().bind(imageStackPane.widthProperty());
+        imageScrollPane.prefHeightProperty().bind(imageStackPane.heightProperty());
         imagePane.prefWidthProperty().bind(imageScrollPane.widthProperty());
         imagePane.prefHeightProperty().bind(imageScrollPane.heightProperty());
         image.fitWidthProperty().bind(imageScrollPane.widthProperty().multiply(zoomFactor));

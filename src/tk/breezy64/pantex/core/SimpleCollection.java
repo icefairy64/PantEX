@@ -33,6 +33,7 @@ public class SimpleCollection extends Collection {
         }
         
         images.put(image.id, image);
+        image.collection = this;
     }
     
     @Override

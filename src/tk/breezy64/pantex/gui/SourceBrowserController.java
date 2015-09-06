@@ -27,6 +27,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
+import tk.breezy64.pantex.core.Collection;
 
 /**
  * FXML Controller class
