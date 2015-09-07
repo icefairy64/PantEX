@@ -11,6 +11,7 @@ import com.yandex.disk.rest.Credentials;
 import com.yandex.disk.rest.ResourcesArgs;
 import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.ServerException;
+import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,6 +47,7 @@ import tk.breezy64.pantex.core.JSONPack;
 import tk.breezy64.pantex.core.RemoteImage;
 import tk.breezy64.pantex.core.Static;
 import tk.breezy64.pantex.core.Util;
+import tk.breezy64.pantex.core.YandexImage;
 import tk.breezy64.pantex.core.auth.AuthException;
 import tk.breezy64.pantex.core.auth.Authorizer;
 import tk.breezy64.pantex.core.auth.Token;
@@ -85,7 +87,7 @@ public class YandexDiskPlugin extends Plugin {
             return "Yandex.Disk";
         }
 
-        private String getFileUrl(String path, YandexToken token) {
+        public static String getFileUrl(String path, YandexToken token) {
             JsonObject root = new JsonParser().parse(Util.fetch(String.format(downloadUrl, path), new String[] { "Authorization", "OAuth " + token.getToken() }))
                     .getAsJsonObject();
             try {
@@ -96,7 +98,7 @@ public class YandexDiskPlugin extends Plugin {
             }
         }
         
-        private InputStream getFileStream(String path, YandexToken token) {
+        private static InputStream getFileStream(String path, YandexToken token) {
             return Util.fetchStream(getFileUrl(path, token), new String[] { "Authorization", "OAuth " + token.getToken() });
         }
         
@@ -129,7 +131,8 @@ public class YandexDiskPlugin extends Plugin {
                                     String path = "app:/" + r.get() + "/collection.json";
                                     JSONPack.load(col, new InputStreamReader(getFileStream(path, token)),
                                             (title) -> {
-                                                EXImage img = new RemoteImage(getFileUrl("app:/" + r.get() + "/" + title, token), col, null);
+                                                EXImage img = new YandexImage("app:/" + r.get() + "/" + title, token, col, title, null);
+                                                //EXImage img = new RemoteImage(getFileUrl("app:/" + r.get() + "/" + title, token), col, null);
                                                 img.title = title;
                                                 return img;
                                             }, importProgressHandler.orElse(null));
@@ -170,17 +173,18 @@ public class YandexDiskPlugin extends Plugin {
                                 j.deleteOnExit();
                                 JSONPack.write(col, new FileWriter(j), (x) -> {
                                     try {
-                                        File f = File.createTempFile("PantEX", "_" + x.title);
-                                        f.deleteOnExit();
-                                        FileOutputStream w = new FileOutputStream(f);
-                                        x.writeImage(w);
-                                        w.close();
                                         try {
-                                            client.uploadFile(client.getUploadLink(path + "/" + x.title, false), true, f, null);
+                                            Link link = client.getUploadLink(path + "/" + x.title, false);
+                                            File f = File.createTempFile("PantEX", "_" + x.title);
+                                            f.deleteOnExit();
+                                            FileOutputStream w = new FileOutputStream(f);
+                                            x.writeImage(w);
+                                            w.close();
+                                            client.uploadFile(link, true, f, null);
+                                            
                                         }
                                         catch (ServerException e) {
                                         }
-                                        f.delete();
                                     }
                                     catch (Exception e) {
                                         FXStatic.handleException(e);

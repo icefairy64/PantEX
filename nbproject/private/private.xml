@@ -6,19 +6,21 @@
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/sources/LusciousSource.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/Exporter.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/JSONPack.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/sources/RedditSource.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/ConfigManager.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/sources/RedditSimpleRequester.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/ConfigSection.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/PantEX.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/auth/Authorizer.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/Importer.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/CollectionsController.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/FXStatic.java</file>
-            <file>file:/home/icefairy64/Coding/Java/PantEX/.gitignore</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/SourceBrowserController.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/EXPack.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/default.css</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/MainController.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/EXPackWrapper.java</file>
+            <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/core/SimpleCollection.java</file>
             <file>file:/home/icefairy64/Coding/Java/PantEX/src/tk/breezy64/pantex/gui/FXCollection.java</file>
         </group>
     </open-files>
