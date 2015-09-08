@@ -53,6 +53,7 @@ import tk.breezy64.pantex.core.auth.Token;
 import tk.breezy64.pantex.gui.auth.WebWindowController;
 import tk.breezy64.pantex.core.auth.YandexToken;
 import tk.breezy64.pantex.gui.FXStatic;
+import tk.breezy64.pantex.gui.MainController;
 
 /**
  *
@@ -120,6 +121,8 @@ public class YandexDiskPlugin extends Plugin {
 
                         // Choosing directory
                         ChoiceDialog<String> dialog = new ChoiceDialog<>(dirs.get(0), dirs);
+                        dialog.getDialogPane().getStylesheets().add(MainController.class.getResource("default.css").toString());
+                        dialog.getDialogPane().getStyleClass().add("dialog");
                         Optional<String> r = dialog.showAndWait();
                         
                         FXStatic.executor.submit(() -> {

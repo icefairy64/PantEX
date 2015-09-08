@@ -10,6 +10,7 @@ import javafx.scene.control.TextInputDialog;
 import ro.fortsoft.pf4j.Extension;
 import tk.breezy64.pantex.core.sources.DanbooruSource;
 import tk.breezy64.pantex.core.sources.ImageSourceRequester;
+import tk.breezy64.pantex.gui.MainController;
 
 /**
  *
@@ -34,6 +35,8 @@ public class DanbooruSearchRequester extends ImageSourceRequester<DanbooruSource
         dialog.setTitle("Danbooru [search]");
         dialog.setHeaderText("Search on Danbooru");
         dialog.setContentText("Tags:");
+        dialog.getDialogPane().getStylesheets().add(MainController.class.getResource("default.css").toString());
+        dialog.getDialogPane().getStyleClass().add("dialog");
         Optional<String> result = dialog.showAndWait();
         if (!result.isPresent()) {
             return null;

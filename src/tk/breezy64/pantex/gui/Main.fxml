@@ -22,9 +22,9 @@
             <Menu fx:id="sourcesMenu" mnemonicParsing="false" text="Sources" />
         </menus>
       </MenuBar>
-      <SplitPane dividerPositions="0.23" prefHeight="372.0" prefWidth="600.0" VBox.vgrow="SOMETIMES">
+      <SplitPane dividerPositions="0.23" prefHeight="372.0" prefWidth="600.0" styleClass="pane" VBox.vgrow="SOMETIMES">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" styleClass="pane" SplitPane.resizableWithParent="false">
                <children>
                   <ListView fx:id="imagesList" layoutY="-2.0" onMouseClicked="#selectImage" prefHeight="372.0" prefWidth="146.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <contextMenu>
@@ -37,18 +37,26 @@
                   </ListView>
                </children>
             </AnchorPane>
-            <StackPane fx:id="imageStackPane">
+            <StackPane fx:id="imageStackPane" styleClass="background">
                <children>
-                  <ScrollPane fx:id="imageScrollPane" hbarPolicy="NEVER" onScroll="#imageZoom" pannable="true" prefHeight="375.0" prefViewportHeight="455.0" prefViewportWidth="522.0" prefWidth="375.0" styleClass="background" vbarPolicy="NEVER">
+                  <ScrollPane fx:id="imageScrollPane" hbarPolicy="NEVER" onScroll="#imageZoom" pannable="true" prefHeight="375.0" prefViewportHeight="455.0" prefViewportWidth="522.0" prefWidth="375.0" styleClass="pane-transparent" vbarPolicy="NEVER">
                      <content>
-                        <HBox fx:id="imagePane" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="191.0" prefWidth="206.0" styleClass="background">
+                        <HBox fx:id="imagePane" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="191.0" prefWidth="206.0">
                            <children>
-                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" styleClass="background">
+                              <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                  <children>
                                     <ImageView fx:id="image" fitHeight="20.0" fitWidth="20.0" onScroll="#imageZoom" pickOnBounds="true" preserveRatio="true" VBox.vgrow="ALWAYS" />
                                  </children>
+                                 <styleClass>
+                                    <String fx:value="pane-transparent" />
+                                    <String fx:value="borderless" />
+                                 </styleClass>
                               </VBox>
                            </children>
+                           <styleClass>
+                              <String fx:value="pane-transparent" />
+                              <String fx:value="borderless" />
+                           </styleClass>
                         </HBox>
                      </content>
                   </ScrollPane>

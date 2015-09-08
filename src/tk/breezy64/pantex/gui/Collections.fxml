@@ -8,18 +8,18 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="414.0" prefWidth="512.0" spacing="8.0" stylesheets="@default.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tk.breezy64.pantex.gui.CollectionsController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="414.0" prefWidth="512.0" spacing="8.0" styleClass="pane" stylesheets="@default.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tk.breezy64.pantex.gui.CollectionsController">
    <padding>
-      <Insets bottom="14.0" left="14.0" right="14.0" top="14.0" />
+      <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
    </padding>
    <children>
-      <SplitPane dividerPositions="0.5" VBox.vgrow="SOMETIMES">
+      <SplitPane dividerPositions="0.5" styleClass="pane-borderless" VBox.vgrow="SOMETIMES">
          <items>
             <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0" HBox.hgrow="SOMETIMES">
                <children>
                   <Label text="Collections:">
                      <padding>
-                        <Insets left="4.0" right="4.0" top="4.0" />
+                        <Insets left="4.0" right="4.0" top="2.0" />
                      </padding></Label>
                   <ListView fx:id="collectionsList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES" />
                </children>
@@ -28,7 +28,7 @@
                <children>
                   <Label text="Images:">
                      <padding>
-                        <Insets left="4.0" right="4.0" top="4.0" />
+                        <Insets left="4.0" right="4.0" top="2.0" />
                      </padding></Label>
                   <ListView fx:id="imagesList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
                      <contextMenu>
@@ -64,6 +64,9 @@
             <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#removeClick" text="Remove" />
             <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#closeClick" text="Close" />
          </children>
+         <padding>
+            <Insets bottom="4.0" right="2.0" />
+         </padding>
       </HBox>
    </children>
 </VBox>

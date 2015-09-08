@@ -66,7 +66,9 @@ public class CollectionsController implements Initializable {
         
         imagesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         imagesList.itemsProperty().bind(Bindings.createObjectBinding(() ->
-                new ObservableListWrapper<>(collectionsList.getSelectionModel().getSelectedItem().images.values().stream().collect(Collectors.toList())),
+                collectionsList.getSelectionModel().getSelectedItem() == null ?
+                    new ObservableListWrapper<>(new ArrayList<>()) :
+                    new ObservableListWrapper<>(collectionsList.getSelectionModel().getSelectedItem().images.values().stream().collect(Collectors.toList())),
                 collectionsList.getSelectionModel().selectedItemProperty(), collectionsList.getSelectionModel().getSelectedItem().images, FXStatic.images));
         imagesList.getSelectionModel().selectedItemProperty().addListener((ChangeListener<FXImage>)(x, oV, nV) -> 
                 FXStatic.currentImage.set(nV));
@@ -133,6 +135,8 @@ public class CollectionsController implements Initializable {
         event.consume();
         FXCollection col = collectionsList.getSelectionModel().getSelectedItem();
         TextInputDialog d = new TextInputDialog(col.title);
+        d.getDialogPane().getScene().getStylesheets().add(getClass().getResource("default.css").toString());
+        d.getDialogPane().getStyleClass().add("dialog");
         d.setContentText("Enter new collection name:");
         d.showAndWait().ifPresent((x) -> col.title = x);
         

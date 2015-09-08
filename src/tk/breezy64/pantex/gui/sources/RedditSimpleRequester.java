@@ -10,6 +10,7 @@ import javafx.scene.control.TextInputDialog;
 import ro.fortsoft.pf4j.Extension;
 import tk.breezy64.pantex.core.sources.ImageSourceRequester;
 import tk.breezy64.pantex.core.sources.RedditSource;
+import tk.breezy64.pantex.gui.MainController;
 
 /**
  *
@@ -34,6 +35,8 @@ public class RedditSimpleRequester extends ImageSourceRequester<RedditSource>{
         d.setTitle("Reddit");
         d.setHeaderText("Subreddit chooser");
         d.setContentText("Enter a subreddit:");
+        d.getDialogPane().getStylesheets().add(MainController.class.getResource("default.css").toString());
+        d.getDialogPane().getStyleClass().add("dialog");
         Optional<String> res = d.showAndWait();
         if (res.isPresent()) {
             return new RedditSource(res.get());

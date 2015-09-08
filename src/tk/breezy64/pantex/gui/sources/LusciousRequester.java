@@ -17,6 +17,7 @@ import tk.breezy64.pantex.core.sources.ImageSourceRequester;
 import tk.breezy64.pantex.core.sources.LusciousCategory;
 import tk.breezy64.pantex.core.sources.LusciousSource;
 import tk.breezy64.pantex.gui.FXStatic;
+import tk.breezy64.pantex.gui.MainController;
 
 /**
  *
@@ -41,6 +42,8 @@ public class LusciousRequester extends ImageSourceRequester<LusciousSource> {
         chooser.setTitle("Luscious");
         chooser.setHeaderText("Choose a category");
         chooser.setContentText("Select:");
+        chooser.getDialogPane().getStylesheets().add(MainController.class.getResource("default.css").toString());
+        chooser.getDialogPane().getStyleClass().add("dialog");
         Optional<LusciousCategory> res = chooser.showAndWait();
         return res.isPresent() ? new LusciousSource(res.get().name) : null;
     }
