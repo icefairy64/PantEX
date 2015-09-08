@@ -5,6 +5,7 @@
  */
 package tk.breezy64.pantex.core.sources;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +45,7 @@ public class RedditSource extends ImageSource {
     }
     
     @Override
-    protected void load(int page) {
+    protected void load(int page) throws IOException {
         String content = Util.fetchHttpContent(url);
         Matcher p = postFilePattern.matcher(content);
         List<EXImage> list = new ArrayList<>();

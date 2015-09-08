@@ -30,7 +30,12 @@ public class YandexImage extends EXImage {
     }
     
     private void load() {
-        inner = Optional.of(new RemoteImage(YandexDiskPlugin.YandexDiskLoader.getFileUrl(path, token), collection, tags));
+        try {
+            inner = Optional.of(new RemoteImage(YandexDiskPlugin.YandexDiskLoader.getFileUrl(path, token), collection, tags));
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     @Override

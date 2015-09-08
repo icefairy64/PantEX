@@ -5,6 +5,7 @@
  */
 package tk.breezy64.pantex.gui;
 
+import java.io.IOException;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.Util;
 import tk.breezy64.pantex.core.sources.ImageSource;
@@ -83,6 +84,7 @@ public class SourceBrowserController implements Initializable {
     private void fetchClick(ActionEvent event) {
         if (src == null) {
             src = (ImageSource)flowPane.getScene().getUserData();
+            src.onException((x) -> FXStatic.handleException(x));
         }
         
         indicateProgressStart();
@@ -125,20 +127,25 @@ public class SourceBrowserController implements Initializable {
     }
     
     private void fetchImage(EXImage img) {
-        ImageView view = new ImageView(new Image(Util.fetchHttpStream(img.thumbURL)));
-        view.setPreserveRatio(true);
-        view.fitWidthProperty().bind(thumbSize);
-        view.fitHeightProperty().bind(thumbSize);
-        view.setUserData(img);
-        view.setCache(true);
-            
-        view.setOnMouseClicked((e) -> {
-            if (e.getClickCount() == 2) {
-                collectionSelector.getSelectionModel().getSelectedItem().addImage(img);
-            }
-            e.consume();
-        });
-            
-        Platform.runLater(() -> flowPane.getChildren().add(view));
+        try {
+            ImageView view = new ImageView(new Image(Util.fetchHttpStream(img.thumbURL)));
+            view.setPreserveRatio(true);
+            view.fitWidthProperty().bind(thumbSize);
+            view.fitHeightProperty().bind(thumbSize);
+            view.setUserData(img);
+            view.setCache(true);
+
+            view.setOnMouseClicked((e) -> {
+                if (e.getClickCount() == 2) {
+                    collectionSelector.getSelectionModel().getSelectedItem().addImage(img);
+                }
+                e.consume();
+            });
+
+            Platform.runLater(() -> flowPane.getChildren().add(view));
+        }
+        catch (IOException e) {
+            FXStatic.handleException(e);
+        }
     }    
 }

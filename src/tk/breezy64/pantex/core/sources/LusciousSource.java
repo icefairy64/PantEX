@@ -5,6 +5,7 @@
  */
 package tk.breezy64.pantex.core.sources;
 
+import java.io.IOException;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.RemoteImage;
 import tk.breezy64.pantex.core.Util;
@@ -31,7 +32,7 @@ public class LusciousSource extends ImageSource {
     }
     
     @Override
-    protected void load(int page) {
+    protected void load(int page) throws IOException {
         String lurl = String.format(url, page + 1);
         String content = Util.fetchHttpContent(lurl);
         Matcher t = thumbPattern.matcher(content);

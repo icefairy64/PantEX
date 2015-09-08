@@ -5,8 +5,11 @@
  */
 package tk.breezy64.pantex.core.sources;
 
+import java.io.IOException;
 import tk.breezy64.pantex.core.EXImage;
 import java.util.Iterator;
+import java.util.Optional;
+import java.util.function.Consumer;
 import ro.fortsoft.pf4j.ExtensionPoint;
 
 /**
@@ -17,12 +20,25 @@ public abstract class ImageSource implements Iterator<EXImage[]>, ExtensionPoint
     
     protected EXImage[] cache;
     protected boolean endReached = false;
-    private int page = 0;
     
-    protected abstract void load(int page);
+    private int page = 0;
+    private Consumer<Exception> exceptionHandler = null;
+    
+    protected abstract void load(int page) throws IOException;
     
     private void load() {
-        load(page++);
+        try {
+            load(page++);
+        }
+        catch (Exception e) {
+            if (exceptionHandler != null) {
+                exceptionHandler.accept(e);
+            }
+            else {
+                System.err.println(e.getClass().toString());
+                throw new RuntimeException(e);
+            }
+        }
     }
     
     @Override
@@ -43,6 +59,11 @@ public abstract class ImageSource implements Iterator<EXImage[]>, ExtensionPoint
         EXImage[] result = cache;
         cache = null;
         return result;
-    } 
+    }
+    
+    public ImageSource onException(Consumer<Exception> handler) {
+        this.exceptionHandler = handler;
+        return this;
+    }
     
 }

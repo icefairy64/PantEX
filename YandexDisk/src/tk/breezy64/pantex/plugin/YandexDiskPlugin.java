@@ -44,7 +44,6 @@ import tk.breezy64.pantex.core.Exporter;
 import tk.breezy64.pantex.core.ImportException;
 import tk.breezy64.pantex.core.Importer;
 import tk.breezy64.pantex.core.JSONPack;
-import tk.breezy64.pantex.core.RemoteImage;
 import tk.breezy64.pantex.core.Static;
 import tk.breezy64.pantex.core.Util;
 import tk.breezy64.pantex.core.YandexImage;
@@ -87,7 +86,7 @@ public class YandexDiskPlugin extends Plugin {
             return "Yandex.Disk";
         }
 
-        public static String getFileUrl(String path, YandexToken token) {
+        public static String getFileUrl(String path, YandexToken token) throws IOException {
             JsonObject root = new JsonParser().parse(Util.fetchHttpContent(String.format(downloadUrl, path), new String[] { "Authorization", "OAuth " + token.getToken() }))
                     .getAsJsonObject();
             try {
@@ -98,7 +97,7 @@ public class YandexDiskPlugin extends Plugin {
             }
         }
         
-        private static InputStream getFileStream(String path, YandexToken token) {
+        private static InputStream getFileStream(String path, YandexToken token) throws IOException {
             return Util.fetchHttpStream(getFileUrl(path, token), new String[] { "Authorization", "OAuth " + token.getToken() });
         }
         
