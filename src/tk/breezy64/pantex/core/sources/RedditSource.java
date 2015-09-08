@@ -45,7 +45,7 @@ public class RedditSource extends ImageSource {
     
     @Override
     protected void load(int page) {
-        String content = Util.fetch(url);
+        String content = Util.fetchHttpContent(url);
         Matcher p = postFilePattern.matcher(content);
         List<EXImage> list = new ArrayList<>();
         while (p.find()) {

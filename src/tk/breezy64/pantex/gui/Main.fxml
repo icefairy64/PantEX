@@ -22,7 +22,7 @@
             <Menu fx:id="sourcesMenu" mnemonicParsing="false" text="Sources" />
         </menus>
       </MenuBar>
-      <SplitPane dividerPositions="0.4601139601139601" prefHeight="372.0" prefWidth="600.0" VBox.vgrow="SOMETIMES">
+      <SplitPane dividerPositions="0.23" prefHeight="372.0" prefWidth="600.0" VBox.vgrow="SOMETIMES">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
                <children>

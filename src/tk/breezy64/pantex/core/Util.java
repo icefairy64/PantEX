@@ -5,18 +5,17 @@
  */
 package tk.breezy64.pantex.core;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.Header;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -26,6 +25,8 @@ public final class Util {
     
     private static final ByteBuffer intBuf = ByteBuffer.allocate(4);
     private static final int bufferSize = 4096;
+    private static final Map<String, OkHttpClient> sessions = new HashMap<>();
+    private static final String defaultSession = "common";
     
     public static final String userAgent = "Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0";
     
@@ -92,38 +93,44 @@ public final class Util {
         in.close();
         return sb.toString();
     }
-
-    public static InputStream fetchStream(String url, String[]... headers) {
-        try {
-            CloseableHttpClient hc = HttpClients.createDefault();
-            HttpGet hr = new HttpGet(url);
-            hr.addHeader("User-Agent", Util.userAgent);
-            for (String[] h : headers) {
-                hr.addHeader(new BasicHeader(h[0], h[1]));
-            }
-            CloseableHttpResponse resp = hc.execute(hr);
-            InputStream in = resp.getEntity().getContent();
-            return in;
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
+    
+    private static Response getHttpResponse(String url, OkHttpClient client, String[]... headers) throws IOException {
+        Request.Builder reqb = new Request.Builder()
+                .url(url)
+                .get()
+                .addHeader("User-Agent", userAgent);
+        for (String[] head : headers) {
+            reqb.addHeader(head[0], head[1]);
         }
+        Request req = reqb.build();
+        
+        return client.newCall(req).execute();
     }
 
-    public static String fetch(String url, String[]... headers) {
-        StringBuilder sb = new StringBuilder();
-        try {
-            InputStream in = Util.fetchStream(url, headers);
-            int len = 0;
-            byte[] buf = new byte[bufferSize];
-            while ((len = in.read(buf)) > 0) {
-                for (int i = 0; i < len; i++) {
-                    sb.append((char) buf[i]);
-                }
-            }
-            in.close();
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
+    public static InputStream fetchHttpStream(String url, String session, String[]... headers) throws IOException {
+        OkHttpClient client;
+        if (session == null) {
+            client = new OkHttpClient();
         }
-        return sb.toString();
+        else {
+            if (!sessions.containsKey(session)) {
+                sessions.put(session, new OkHttpClient());
+            }
+            client = sessions.get(session);
+        }
+        
+        return getHttpResponse(url, client, headers).body().byteStream();
+    }
+    
+    public static InputStream fetchHttpStream(String url, String[]... headers) throws IOException {
+        return fetchHttpStream(url, defaultSession, headers);
+    }
+
+    public static String fetchHttpContent(String url, String[]... headers) throws IOException {
+        if (!sessions.containsKey(defaultSession)) {
+            sessions.put(defaultSession, new OkHttpClient());
+        }
+        
+        return getHttpResponse(url, sessions.get(defaultSession), headers).body().string();
     }
 }

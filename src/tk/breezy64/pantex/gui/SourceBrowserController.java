@@ -125,7 +125,7 @@ public class SourceBrowserController implements Initializable {
     }
     
     private void fetchImage(EXImage img) {
-        ImageView view = new ImageView(new Image(Util.fetchStream(img.thumbURL)));
+        ImageView view = new ImageView(new Image(Util.fetchHttpStream(img.thumbURL)));
         view.setPreserveRatio(true);
         view.fitWidthProperty().bind(thumbSize);
         view.fitHeightProperty().bind(thumbSize);

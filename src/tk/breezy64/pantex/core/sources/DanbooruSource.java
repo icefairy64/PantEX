@@ -46,7 +46,7 @@ public class DanbooruSource extends ImageSource {
     @Override
     protected void load(int page) {
         String lurl = url.replace("%d", Integer.toString(page + 1));
-        String content = Util.fetch(lurl);
+        String content = Util.fetchHttpContent(lurl);
         Matcher m = imgPattern.matcher(content);
         Matcher t = thumbPattern.matcher(content);
         Matcher tg = tagsPattern.matcher(content);

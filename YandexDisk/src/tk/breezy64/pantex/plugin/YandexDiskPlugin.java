@@ -88,7 +88,7 @@ public class YandexDiskPlugin extends Plugin {
         }
 
         public static String getFileUrl(String path, YandexToken token) {
-            JsonObject root = new JsonParser().parse(Util.fetch(String.format(downloadUrl, path), new String[] { "Authorization", "OAuth " + token.getToken() }))
+            JsonObject root = new JsonParser().parse(Util.fetchHttpContent(String.format(downloadUrl, path), new String[] { "Authorization", "OAuth " + token.getToken() }))
                     .getAsJsonObject();
             try {
                 return root.get("href").getAsString();
@@ -99,7 +99,7 @@ public class YandexDiskPlugin extends Plugin {
         }
         
         private static InputStream getFileStream(String path, YandexToken token) {
-            return Util.fetchStream(getFileUrl(path, token), new String[] { "Authorization", "OAuth " + token.getToken() });
+            return Util.fetchHttpStream(getFileUrl(path, token), new String[] { "Authorization", "OAuth " + token.getToken() });
         }
         
         @Override

@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -30,6 +32,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.Exporter;
 import tk.breezy64.pantex.core.Importer;
 import tk.breezy64.pantex.core.Static;
@@ -197,9 +200,10 @@ public class CollectionsController implements Initializable {
         dialog.setContentText("Collection:");
         
         Optional<FXCollection> col = dialog.showAndWait();
-        col.ifPresent((x) ->
-            imagesList.getSelectionModel().getSelectedItems().stream().forEach((img) -> 
-                    img.getEXImage().collection.moveImage(img.getEXImage(), x)));
+        col.ifPresent((x) -> {
+            List<FXImage> l = new ArrayList<>(imagesList.getSelectionModel().getSelectedItems());
+            l.forEach((img) -> img.getEXImage().collection.moveImage(img.getEXImage(), x));
+        });
         
         event.consume();
     }
