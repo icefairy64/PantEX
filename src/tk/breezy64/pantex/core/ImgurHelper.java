@@ -19,16 +19,17 @@ public class ImgurHelper {
     
     private static final Pattern[] imagePatterns = new Pattern[] {
         Pattern.compile("data-src=\"(.+?)\""),
-        Pattern.compile("twitter:image\".+?content=\"(.+?)\""),
+        Pattern.compile("twitter:image.+?content=\"(.+?)\""),
         Pattern.compile("class=\"(?:[a-z0-9\\-\\ ]*?\\ )??image(?:\\ ?[a-z0-9\\-\\ ]*?)??\".+?(?:img|a).+?(?:src|href)=\"(.+?)\"", Pattern.DOTALL)
     };
     
     public static List<EXImage> getAlbumImages(String url) throws IOException {
         List<EXImage> list = new ArrayList<>();
+        List<String> hashes = new ArrayList<>();
         
         String content = Util.fetchHttpContent(url);
         int i = 0;
-        while (list.isEmpty() && i < imagePatterns.length) {
+        while (hashes.isEmpty() && i < imagePatterns.length) {
             Matcher m = imagePatterns[i++].matcher(content);
             while (m.find()) {
                 String match = m.group(1);
@@ -37,16 +38,22 @@ public class ImgurHelper {
                     continue;
                 }
 
-                String hash = match.substring(match.lastIndexOf("/") + 1).substring(0, 7);
-                String ext = match.substring(match.lastIndexOf("."));
-                String imgUrl = "http://i.imgur.com/" + hash + ext;
-                String thumbUrl = "http://i.imgur.com/" + hash + "m.jpg";
-
-                EXImage img = new RemoteImage(imgUrl);
-                img.thumb = new RemoteImage(thumbUrl);
-                Cache.getInstance().find(img.thumb).ifPresent((x) -> img.thumb = x);
-                list.add(img);
+                String hash = match.substring(match.lastIndexOf("/") + 1).substring(0, 7) + match.substring(match.lastIndexOf("."));
+                if (!hashes.contains(hash)) {
+                    hashes.add(hash);
+                }
             }
+        }
+        
+        for (String hash : hashes) {
+            String ext = hash.substring(hash.lastIndexOf("."));
+            String imgUrl = "http://i.imgur.com/" + hash;
+            String thumbUrl = "http://i.imgur.com/" + hash.replace(ext, "m" + ext);
+
+            EXImage img = new RemoteImage(imgUrl);
+            img.thumb = new RemoteImage(thumbUrl);
+            Cache.getInstance().find(img.thumb).ifPresent((x) -> img.thumb = x);
+            list.add(img);
         }
         
         if (list.isEmpty()) {
