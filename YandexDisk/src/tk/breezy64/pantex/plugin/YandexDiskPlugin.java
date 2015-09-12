@@ -11,6 +11,7 @@ import com.yandex.disk.rest.Credentials;
 import com.yandex.disk.rest.ResourcesArgs;
 import com.yandex.disk.rest.RestClient;
 import com.yandex.disk.rest.exceptions.ServerException;
+import com.yandex.disk.rest.exceptions.ServerIOException;
 import com.yandex.disk.rest.json.Link;
 import com.yandex.disk.rest.json.Resource;
 import java.io.File;
@@ -155,6 +156,11 @@ public class YandexDiskPlugin extends Plugin {
                 }
             });
         }
+        
+        private static List<Resource> getResources(RestClient client, String path) throws IOException, ServerIOException {
+            return client.getResources(new ResourcesArgs.Builder().setPath(path).setLimit(collectionLimit).build())
+                    .getResourceList().getItems();
+        }
 
         @Override
         public void export(Collection col) throws IOException, ExportException {
@@ -167,13 +173,20 @@ public class YandexDiskPlugin extends Plugin {
                             try {
                                 RestClient client = new RestClient(new Credentials(token.getUid(), token.getToken()));
                                 String path = "app:/" + col.title;
-                                if (!client.getResources(new ResourcesArgs.Builder().setPath("app:/").setLimit(collectionLimit).build()).getResourceList().getItems().stream().anyMatch((x) -> x.getName().equals(col.title))) {
+                                if (!getResources(client, "app:/").stream().anyMatch((x) -> x.getName().equals(col.title))) {
                                     client.makeFolder(path);
                                 }
-
+                                
+                                List<String> ignore = getResources(client, path)
+                                        .stream().map((x) -> x.getName())
+                                        .collect(Collectors.toList());
+                                
                                 File j = File.createTempFile("PantEX", ".json");
                                 j.deleteOnExit();
                                 JSONPack.write(col, new FileWriter(j), (x) -> {
+                                    if (ignore.contains(x.title)) {
+                                        return;
+                                    }
                                     try {
                                         try {
                                             Link link = client.getUploadLink(path + "/" + x.title, false);

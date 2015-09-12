@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  */
 public class ImgurHelper {
     
-    private static final Pattern imagePattern = Pattern.compile("class=\"image\".+?href=\"(.+?)\"", Pattern.DOTALL);
+    private static final Pattern imagePattern = Pattern.compile("class=\"[a-z0-9\\-\\ ]*?image\".+?img.+?src=\"(.+?)\"", Pattern.DOTALL);
     
     public static List<EXImage> getAlbumImages(String url) throws IOException {
         List<EXImage> list = new ArrayList<>();
@@ -25,14 +25,19 @@ public class ImgurHelper {
         String content = Util.fetchHttpContent(url);
         Matcher m = imagePattern.matcher(content);
         while (m.find()) {
-            String imgUrl = "http:" + m.group(1);
-            String ext = imgUrl.substring(imgUrl.lastIndexOf("."));
-            String thumbUrl = imgUrl.replace(ext, "m" + ext);
+            String hash = m.group(1).substring(m.group(1).lastIndexOf("/") + 1).substring(0, 7);
+            String ext = m.group(1).substring(m.group(1).lastIndexOf("."));
+            String imgUrl = "http://i.imgur.com/" + hash + ext;
+            String thumbUrl = "http://i.imgur.com/" + hash + "m.jpg";
             
             EXImage img = new RemoteImage(imgUrl);
             img.thumb = new RemoteImage(thumbUrl);
             Cache.getInstance().find(img.thumb).ifPresent((x) -> img.thumb = x);
             list.add(img);
+        }
+        
+        if (list.size() == 0) {
+            System.out.println("Warning: Imgur helper probably failed to parse page " + url);
         }
         
         return list;

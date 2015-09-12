@@ -38,7 +38,7 @@ public class FXStatic {
     
     
     public static void handleException(Throwable e) {
-        e.printStackTrace();
+        e.printStackTrace(System.err);
         throw new RuntimeException(e);
     }
     

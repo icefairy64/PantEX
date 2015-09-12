@@ -29,8 +29,8 @@ public class RedditSource extends ImageSource {
     private final static String moreUrl = "https://www.reddit.com/r/%s/new/?count=25&after=%s";
     
     private final static Pattern postPattern = Pattern.compile("div class=.+?data\\-fullname=\"(.+?)\"");
-    private final static Pattern postFilePattern = Pattern.compile("a class=\"thumbnail.+?href=\"(.+?)\"(.+?)\\/a", Pattern.DOTALL);
-    private final static Pattern postThumbPattern = Pattern.compile("img.+?src=\"(.+?)\"");
+    private final static Pattern postFilePattern = Pattern.compile("a class=\"thumbnail.+?href=\"(.+?)\"(.+?)<\\/a", Pattern.DOTALL);
+    private final static Pattern postThumbPattern = Pattern.compile("img.+?src=\"(.+?)\"", Pattern.DOTALL);
     private final static Pattern over18Pattern = Pattern.compile("class=\"interstitial");
     
     private final String subreddit;
@@ -60,7 +60,7 @@ public class RedditSource extends ImageSource {
             return res;
         }
         
-        if (url.contains("imgur.com/a/")) {
+        if (url.contains("imgur.com")) {
             return ImgurHelper.getAlbumImages(url);
         }
         
