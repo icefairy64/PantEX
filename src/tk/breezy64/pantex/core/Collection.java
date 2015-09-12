@@ -12,11 +12,11 @@ package tk.breezy64.pantex.core;
 public abstract class Collection {
     
     public String title;
-    public final int id;
+    public final int index;
 
     public Collection(String title) {
         this.title = title;
-        this.id = lastID++;
+        this.index = lastID++;
     }
     
     public void addImages(EXImage... imgs) {

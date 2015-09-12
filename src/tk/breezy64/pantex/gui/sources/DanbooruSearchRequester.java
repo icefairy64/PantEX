@@ -36,7 +36,7 @@ public class DanbooruSearchRequester extends ImageSourceRequester<DanbooruSource
         dialog.setHeaderText("Search on Danbooru");
         dialog.setContentText("Tags:");
         dialog.getDialogPane().getStylesheets().add(MainController.class.getResource("default.css").toString());
-        dialog.getDialogPane().getStyleClass().add("dialog");
+        dialog.getDialogPane().getStyleClass().add("dialog-pane");
         Optional<String> result = dialog.showAndWait();
         if (!result.isPresent()) {
             return null;

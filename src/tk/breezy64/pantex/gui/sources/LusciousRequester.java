@@ -43,7 +43,7 @@ public class LusciousRequester extends ImageSourceRequester<LusciousSource> {
         chooser.setHeaderText("Choose a category");
         chooser.setContentText("Select:");
         chooser.getDialogPane().getStylesheets().add(MainController.class.getResource("default.css").toString());
-        chooser.getDialogPane().getStyleClass().add("dialog");
+        chooser.getDialogPane().getStyleClass().add("dialog-pane");
         Optional<LusciousCategory> res = chooser.showAndWait();
         return res.isPresent() ? new LusciousSource(res.get().name) : null;
     }

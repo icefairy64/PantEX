@@ -7,10 +7,13 @@ package tk.breezy64.pantex.core.sources;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import tk.breezy64.pantex.core.Cache;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.RemoteImage;
 import tk.breezy64.pantex.core.Util;
@@ -25,8 +28,9 @@ public class RedditSource extends ImageSource {
     private final static String moreUrl = "https://www.reddit.com/r/%s/new/?count=25&after=%s";
     
     private final static Pattern postPattern = Pattern.compile("div class=.+?data\\-fullname=\"(.+?)\"");
-    private final static Pattern postFilePattern = Pattern.compile("a class=\"thumbnail.+?href=\"(.+?)\".+?\\/a", Pattern.DOTALL);
+    private final static Pattern postFilePattern = Pattern.compile("a class=\"thumbnail.+?href=\"(.+?)\"(.+?)\\/a", Pattern.DOTALL);
     private final static Pattern postThumbPattern = Pattern.compile("img.+?src=\"(.+?)\"");
+    private final static Pattern over18Pattern = Pattern.compile("class=\"interstitial");
     
     private final String subreddit;
     private Optional<String> lastPostId = Optional.empty();
@@ -44,25 +48,48 @@ public class RedditSource extends ImageSource {
                 || s.endsWith(".gif");
     }
     
+    private List<EXImage> getPostContents(String url, String thumb) {
+        List<EXImage> res = new ArrayList<>();
+        if (checkExtension(url)) {
+            EXImage img = new RemoteImage(url);
+            res.add(img);
+            img.thumbURL = thumb == null ? url : thumb;
+            img.thumb = new RemoteImage(img.thumbURL);
+            Cache.getInstance().find(img.thumb).ifPresent((x) -> img.thumb = x);
+            
+            return res;
+        }
+        
+        return res;
+    }
+    
     @Override
     protected void load(int page) throws IOException {
-        String content = Util.fetchHttpContent(url);
+        String content = Util.fetchHttpContent(url, new String[] { "Cookie", "over18=1" });
+        
+        Matcher o18 = over18Pattern.matcher(content);
+        
+        if (o18.find()) {
+            // Over 18?
+            Map<String, String> params = new HashMap<>();
+            params.put("over18", "yes");
+            Util.post(url, params);
+            content = Util.fetchHttpContent(url);
+        }
+        
         Matcher p = postFilePattern.matcher(content);
         List<EXImage> list = new ArrayList<>();
+        
         while (p.find()) {
             String file = p.group(1);
             String inner = p.group(2);
             String thumb = null;
             Matcher i = postThumbPattern.matcher(inner);
-            if (p.find()) {
-                thumb = p.group(1);
+            if (i.find()) {
+                thumb = "http:" + i.group(1);
             }
             
-            if (checkExtension(file)) {
-                EXImage img = new RemoteImage(file, null, null);
-                list.add(img);
-                img.thumbURL = thumb != null ? thumb : file;
-            }
+            list.addAll(getPostContents(file, thumb));
         }
         
         p = postPattern.matcher(content);

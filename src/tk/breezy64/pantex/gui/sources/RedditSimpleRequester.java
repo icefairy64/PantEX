@@ -36,7 +36,7 @@ public class RedditSimpleRequester extends ImageSourceRequester<RedditSource>{
         d.setHeaderText("Subreddit chooser");
         d.setContentText("Enter a subreddit:");
         d.getDialogPane().getStylesheets().add(MainController.class.getResource("default.css").toString());
-        d.getDialogPane().getStyleClass().add("dialog");
+        d.getDialogPane().getStyleClass().add("dialog-pane");
         Optional<String> res = d.showAndWait();
         if (res.isPresent()) {
             return new RedditSource(res.get());

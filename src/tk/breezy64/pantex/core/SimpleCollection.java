@@ -25,20 +25,20 @@ public class SimpleCollection extends Collection {
     
     @Override
     public void addImage(EXImage image) {
-        image.id = maxImgId++;
+        image.index = maxImgId++;
         
-        if (images.containsKey(image.id)) {
+        if (images.containsKey(image.index)) {
             throw new RuntimeException(new CollectionException(
-                    String.format("Image with ID %d is already exists in collection %s", image.id, title)));
+                    String.format("Image with ID %d is already exists in collection %s", image.index, title)));
         }
         
-        images.put(image.id, image);
+        images.put(image.index, image);
         image.collection = this;
     }
     
     @Override
     public void removeImage(EXImage img) {
-        images.remove(img.id);
+        images.remove(img.index);
     }
 
     @Override

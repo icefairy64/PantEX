@@ -1,3 +1,4 @@
+/nbproject/private/
 /libs/
 /YandexDisk/nbproject/private/
 /YandexDisk/lib/
@@ -7,3 +8,4 @@
 /config.json
 /src/tk/breezy64/pantex/gui/*.otf
 **/*.log
+**/*.jar

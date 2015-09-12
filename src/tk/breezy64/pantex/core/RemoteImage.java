@@ -21,6 +21,10 @@ public class RemoteImage extends EXImage {
     protected String url;
     protected FileImage local;
     
+    public RemoteImage(String url) {
+        this(url, null, null);
+    }
+    
     public RemoteImage(String url, Collection collection, List<Tag> tags) {
         super(collection, url.substring(url.lastIndexOf("/") + 1, url.length()), tags);
         

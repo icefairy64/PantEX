@@ -31,7 +31,7 @@ public class FXCollection extends Collection {
     @Override
     public void addImage(EXImage img) {
         images.put(maxImgId++, new FXImage(img));
-        img.id = maxImgId - 1;
+        img.index = maxImgId - 1;
         img.collection = this;
     }
 
@@ -46,7 +46,7 @@ public class FXCollection extends Collection {
             }
         }
         
-        images.remove(target.getEXImage().id);
+        images.remove(target.getEXImage().index);
     }
     
     @Override
@@ -69,7 +69,7 @@ public class FXCollection extends Collection {
     
     public static FXCollection create(String title) {
         FXCollection col = new FXCollection(title);
-        dictionary.put(col.id, col);
+        dictionary.put(col.index, col);
         return col;
     }
 

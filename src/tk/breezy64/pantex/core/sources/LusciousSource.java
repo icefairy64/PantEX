@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import tk.breezy64.pantex.core.Cache;
 
 /**
  *
@@ -43,8 +44,12 @@ public class LusciousSource extends ImageSource {
             String furl = "http://" + t.group(1).substring(2);
             String ext = furl.substring(furl.lastIndexOf(".") + 1, furl.length());
             String iurl = furl.replaceFirst("\\.\\d.+?x\\d\\..*", "." + ext);
-            imgs.add(new RemoteImage(iurl, null, null));
-            imgs.get(imgs.size() - 1).thumbURL = furl;
+            
+            EXImage img = new RemoteImage(iurl);
+            imgs.add(img);
+            img.thumbURL = furl;
+            img.thumb = new RemoteImage(furl);
+            Cache.getInstance().find(img.thumb).ifPresent((x) -> img.thumb = x);
         }
         
         cache = imgs.toArray(new EXImage[0]);

@@ -5,13 +5,18 @@
  */
 package tk.breezy64.pantex.core;
 
+import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+import java.net.CookieStore;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
@@ -107,19 +112,41 @@ public final class Util {
         return client.newCall(req).execute();
     }
 
-    public static InputStream fetchHttpStream(String url, String session, String[]... headers) throws IOException {
+    private static OkHttpClient getClient(String session) {
         OkHttpClient client;
         if (session == null) {
             client = new OkHttpClient();
         }
         else {
             if (!sessions.containsKey(session)) {
-                sessions.put(session, new OkHttpClient());
+                OkHttpClient c = new OkHttpClient();
+                sessions.put(session, c);
             }
             client = sessions.get(session);
         }
         
-        return getHttpResponse(url, client, headers).body().byteStream();
+        return client;
+    }
+    
+    public static InputStream fetchHttpStream(String url, String session, String[]... headers) throws IOException {
+        return getHttpResponse(url, getClient(session), headers).body().byteStream();
+    }
+    
+    public static String post(String url, Map<String, String> params) throws IOException {
+        OkHttpClient client = getClient(defaultSession);
+        FormEncodingBuilder b = new FormEncodingBuilder();
+        for (Map.Entry<String, String> e : params.entrySet()) {
+            b.add(e.getKey(), e.getValue());
+        }
+        
+        Request req = new Request.Builder()
+                .post(b.build())
+                .url(url)
+                .build();
+        
+        Response r = client.newCall(req).execute();
+        System.out.println("Result: " + r.toString());
+        return r.body().string();
     }
     
     public static InputStream fetchHttpStream(String url, String[]... headers) throws IOException {
@@ -127,10 +154,6 @@ public final class Util {
     }
 
     public static String fetchHttpContent(String url, String[]... headers) throws IOException {
-        if (!sessions.containsKey(defaultSession)) {
-            sessions.put(defaultSession, new OkHttpClient());
-        }
-        
-        return getHttpResponse(url, sessions.get(defaultSession), headers).body().string();
+        return getHttpResponse(url, getClient(defaultSession), headers).body().string();
     }
 }

@@ -8,6 +8,7 @@ package tk.breezy64.pantex.core;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import ro.fortsoft.pf4j.ExtensionPoint;
@@ -21,12 +22,15 @@ public abstract class EXImage implements ExtensionPoint {
     public Collection collection;
     public String title;
     public String thumbURL;
-    public int id;
+    public EXImage thumb;
+    public int index;
+    public long id;
 
     protected EXImage(Collection collection, String title, List<Tag> tags) {
         this.tags = tags == null ? new LinkedList<>() : tags;
         this.collection = collection;
         this.title = title;
+        this.id = (new Date().toString() + title).hashCode();
     }
 
     @Override

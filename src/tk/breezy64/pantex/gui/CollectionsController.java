@@ -136,7 +136,7 @@ public class CollectionsController implements Initializable {
         FXCollection col = collectionsList.getSelectionModel().getSelectedItem();
         TextInputDialog d = new TextInputDialog(col.title);
         d.getDialogPane().getScene().getStylesheets().add(getClass().getResource("default.css").toString());
-        d.getDialogPane().getStyleClass().add("dialog");
+        d.getDialogPane().getStyleClass().add("dialog-pane");
         d.setContentText("Enter new collection name:");
         d.showAndWait().ifPresent((x) -> col.title = x);
         
@@ -183,7 +183,7 @@ public class CollectionsController implements Initializable {
     private void removeClick(ActionEvent event) {
         FXCollection col = collectionsList.getSelectionModel().getSelectedItem();
         if (col != null) {
-            FXCollection.dictionary.remove(col.id);
+            FXCollection.dictionary.remove(col.index);
             collectionsList.getItems().remove(col);
         }
     }
