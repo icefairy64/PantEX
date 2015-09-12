@@ -135,6 +135,7 @@ and open the template in the editor.
 .combo-box .arrow-button {
     -fx-background-color: linear-gradient(to bottom, #5d5d62, #4a4a4d);
     -fx-effect: dropshadow(gaussian, #8a9df2, 3, 0.1, 0, 0);
+    -fx-effect: innershadow(gaussian, #8a9df2, 3, 0.1, 0, 0);
 }
 
 .menu-bar .menu-button {

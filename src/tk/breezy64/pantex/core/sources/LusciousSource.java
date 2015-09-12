@@ -47,7 +47,6 @@ public class LusciousSource extends ImageSource {
             
             EXImage img = new RemoteImage(iurl);
             imgs.add(img);
-            img.thumbURL = furl;
             img.thumb = new RemoteImage(furl);
             Cache.getInstance().find(img.thumb).ifPresent((x) -> img.thumb = x);
         }

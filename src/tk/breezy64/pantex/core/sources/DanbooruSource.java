@@ -64,8 +64,7 @@ public class DanbooruSource extends ImageSource {
             
             EXImage img = new RemoteImage(furl, null, Arrays.stream(tags).map((x) -> Tag.getOrCreate(x)).collect(Collectors.toList()));
             imgs.add(img);
-            img.thumbURL = root + t.group(1);
-            img.thumb = new RemoteImage(img.thumbURL);
+            img.thumb = new RemoteImage(root + t.group(1));
             Cache.getInstance().find(img.thumb).ifPresent((x) -> img.thumb = x);
         }
         

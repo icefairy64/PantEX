@@ -21,7 +21,6 @@ public abstract class EXImage implements ExtensionPoint {
     public List<Tag> tags;
     public Collection collection;
     public String title;
-    public String thumbURL;
     public EXImage thumb;
     public int index;
     public long id;

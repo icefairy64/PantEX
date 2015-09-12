@@ -15,6 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import tk.breezy64.pantex.core.Cache;
 import tk.breezy64.pantex.core.EXImage;
+import tk.breezy64.pantex.core.ImgurHelper;
 import tk.breezy64.pantex.core.RemoteImage;
 import tk.breezy64.pantex.core.Util;
 
@@ -48,16 +49,19 @@ public class RedditSource extends ImageSource {
                 || s.endsWith(".gif");
     }
     
-    private List<EXImage> getPostContents(String url, String thumb) {
+    private List<EXImage> getPostContents(String url, String thumb) throws IOException {
         List<EXImage> res = new ArrayList<>();
         if (checkExtension(url)) {
             EXImage img = new RemoteImage(url);
             res.add(img);
-            img.thumbURL = thumb == null ? url : thumb;
-            img.thumb = new RemoteImage(img.thumbURL);
+            img.thumb = new RemoteImage(thumb == null ? url : thumb);
             Cache.getInstance().find(img.thumb).ifPresent((x) -> img.thumb = x);
             
             return res;
+        }
+        
+        if (url.contains("imgur.com/a/")) {
+            return ImgurHelper.getAlbumImages(url);
         }
         
         return res;
