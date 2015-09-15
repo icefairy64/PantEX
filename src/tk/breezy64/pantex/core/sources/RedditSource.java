@@ -69,7 +69,7 @@ public class RedditSource extends ImageSource {
     
     @Override
     protected void load(int page) throws IOException {
-        String content = Util.fetchHttpContent(url, new String[] { "Cookie", "over18=1" });
+        String content = Util.fetchHttpContent(url, "reddit", new String[] { "Cookie", "over18=1" });
         
         Matcher o18 = over18Pattern.matcher(content);
         

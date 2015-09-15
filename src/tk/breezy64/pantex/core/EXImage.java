@@ -42,7 +42,7 @@ public abstract class EXImage implements ExtensionPoint {
     }
     
     public abstract InputStream getImageStream() throws IOException;
-    public abstract void writeImage(OutputStream out);
-    public abstract int getImageSize();
+    public abstract void writeImage(OutputStream out) throws IOException;
+    public abstract int getImageSize() throws IOException;
     
 }

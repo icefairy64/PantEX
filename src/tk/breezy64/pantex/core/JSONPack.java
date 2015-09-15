@@ -59,6 +59,10 @@ public class JSONPack {
         
         int i = 0;
         for (EXImage img : imgs) {
+            if (img instanceof Loadable) {
+                ((Loadable)img).load();
+            }
+            
             JsonObject imgRoot = new JsonObject();
             imgsArray.add(imgRoot);
             JsonArray imgTagsArray = new JsonArray();
@@ -74,6 +78,7 @@ public class JSONPack {
             }
             
             saver.accept(img);
+
             if (progressHandler != null) {
                 progressHandler.accept(++i, imgs.length);
             }

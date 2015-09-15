@@ -8,7 +8,6 @@ package tk.breezy64.pantex.core;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +15,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.net.CookieStore;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
@@ -115,15 +113,19 @@ public final class Util {
     private static OkHttpClient getClient(String session) {
         OkHttpClient client;
         if (session == null) {
-            client = new OkHttpClient();
+            session = defaultSession;
         }
-        else {
-            if (!sessions.containsKey(session)) {
-                OkHttpClient c = new OkHttpClient();
-                sessions.put(session, c);
+        
+        if (!sessions.containsKey(session)) {
+            OkHttpClient c = new OkHttpClient();
+            if (session.equals(defaultSession)) {
+                CookieManager cookieManager = new CookieManager();
+                cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+                c.setCookieHandler(cookieManager);
             }
-            client = sessions.get(session);
+            sessions.put(session, c);
         }
+        client = sessions.get(session);
         
         return client;
     }
@@ -155,5 +157,9 @@ public final class Util {
 
     public static String fetchHttpContent(String url, String[]... headers) throws IOException {
         return getHttpResponse(url, getClient(defaultSession), headers).body().string();
+    }
+    
+    public static String fetchHttpContent(String url, String session, String[]... headers) throws IOException {
+        return getHttpResponse(url, getClient(session), headers).body().string();
     }
 }

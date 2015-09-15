@@ -40,15 +40,10 @@ public class FileImage extends EXImage {
     }
 
     @Override
-    public void writeImage(OutputStream out) {
-        try {
-            InputStream in = new FileInputStream(file);
-            Util.copy(in, out);
-            in.close();
-        }
-        catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void writeImage(OutputStream out) throws IOException {
+        InputStream in = new FileInputStream(file);
+        Util.copy(in, out);
+        in.close();
     }
 
     @Override

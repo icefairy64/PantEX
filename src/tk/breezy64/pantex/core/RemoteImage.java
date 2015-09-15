@@ -58,7 +58,7 @@ public class RemoteImage extends EXImage {
     }
     
     @Override
-    public void writeImage(OutputStream out) {
+    public void writeImage(OutputStream out) throws IOException {
         if (local == null) {
             load();
         }

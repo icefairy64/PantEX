@@ -55,7 +55,7 @@ public class YandexImage extends EXImage {
     }
 
     @Override
-    public void writeImage(OutputStream out) {
+    public void writeImage(OutputStream out) throws IOException {
         if (!inner.isPresent()) {
             load();
         }

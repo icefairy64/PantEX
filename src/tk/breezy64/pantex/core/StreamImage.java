@@ -33,14 +33,9 @@ public class StreamImage extends EXImage {
     }
 
     @Override
-    public void writeImage(OutputStream out) {
-        try {
-            stream.reset();
-            Util.copy(stream, out, expectedSize);
-        }
-        catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void writeImage(OutputStream out) throws IOException {
+        stream.reset();
+        Util.copy(stream, out, expectedSize);
     }
 
     @Override
