@@ -33,6 +33,8 @@ public class RedditSource extends ImageSource {
     private final static Pattern postThumbPattern = Pattern.compile("img.+?src=\"(.+?)\"", Pattern.DOTALL);
     private final static Pattern over18Pattern = Pattern.compile("class=\"interstitial");
     
+    private final static String imagePattern = ".+\\.(?:png|gif|jp[e]?g)(?:\\.[0-9])?";
+    
     private final String subreddit;
     private Optional<String> lastPostId = Optional.empty();
     private String url;
@@ -43,10 +45,7 @@ public class RedditSource extends ImageSource {
     }
     
     private boolean checkExtension(String s) {
-        return s.endsWith(".jpg") 
-                || s.endsWith(".jpeg")
-                || s.endsWith(".png")
-                || s.endsWith(".gif");
+        return s.matches(imagePattern);
     }
     
     private List<EXImage> getPostContents(String url, String thumb) throws IOException {

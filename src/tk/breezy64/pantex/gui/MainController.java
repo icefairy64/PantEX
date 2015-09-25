@@ -64,10 +64,6 @@ public class MainController implements Initializable {
     @FXML
     private MenuItem collectionsButton;
     @FXML
-    private MenuItem removeItemButton;
-    @FXML
-    private ListView<FXImage> imagesList;
-    @FXML
     private ImageView image;
     @FXML
     private HBox imagePane;
@@ -87,8 +83,6 @@ public class MainController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        imagesList.setItems(FXStatic.images);
-        imagesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         imageScrollPane.prefWidthProperty().bind(imageStackPane.widthProperty());
         imageScrollPane.prefHeightProperty().bind(imageStackPane.heightProperty());
         imagePane.prefWidthProperty().bind(imageScrollPane.widthProperty());
@@ -138,21 +132,6 @@ public class MainController implements Initializable {
     @FXML
     private void showCollections(ActionEvent event) throws IOException {
         Util.showScene(new Scene(FXMLLoader.load(getClass().getResource("Collections.fxml"))), "Collections");
-    }
-
-    @FXML
-    private void removeItem(ActionEvent event) {
-        FXImage img = imagesList.getSelectionModel().getSelectedItem();
-        img.getEXImage().collection.removeImage(img.getEXImage());
-    }
-
-    @FXML
-    private void selectImage(MouseEvent event) {
-        event.consume();
-        if (event.getClickCount() == 2) {
-            FXImage img = imagesList.getSelectionModel().getSelectedItem();
-            FXStatic.currentImage.set(img);
-        }
     }
     
     private void onImageLoaded(Image img) {
@@ -231,6 +210,11 @@ public class MainController implements Initializable {
     private void imageZoom(ScrollEvent event) {
         zoomFactor.set(zoomFactor.get() + zoomFactor.get() * 0.2 * Math.signum(event.getDeltaY()));
         event.consume();
+    }
+
+    @FXML
+    private void showImageList(ActionEvent event) throws IOException {
+        Util.showScene(new Scene(FXMLLoader.load(getClass().getResource("ImagesList.fxml"))), "Image list");
     }
     
 }
