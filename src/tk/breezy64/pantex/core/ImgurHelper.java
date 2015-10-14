@@ -21,7 +21,7 @@ public class ImgurHelper {
         Pattern.compile("data-src=\"(.+?)\""),
         Pattern.compile("twitter:image.+?content=\"(.+?)\""),
         Pattern.compile("class=\"(?:[a-z0-9\\-\\ ]*?\\ )??image(?:\\ ?[a-z0-9\\-\\ ]*?)??\".+?(?:img|a).+?(?:src|href)=\"(.+?)\"", Pattern.DOTALL),
-        Pattern.compile("class=\"[^\"]+?post\\-image.+?img.+?src=\"(.+?)\"", Pattern.DOTALL),
+        Pattern.compile("class=\"[^\"]+?post-image.+?img.+?src=\"(.+?)\"", Pattern.DOTALL),
         Pattern.compile("property=\"og:image\".+?content=\"(.+?)\"")
     };
     

@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import tk.breezy64.pantex.core.ConfigManager;
+import tk.breezy64.pantex.core.FileImage;
 import tk.breezy64.pantex.core.ImgurHelper;
 import tk.breezy64.pantex.core.Static;
 
@@ -28,10 +29,15 @@ public class PantEX extends Application {
     public void init() throws Exception {
         super.init();
         
-        FXCollection.create("Temp");
+        FXCollection.createAndAdd("Temp");
         Static.pluginManager.loadPlugins();
         Static.pluginManager.startPlugins();
         ConfigManager.load(new File(configFile));
+        
+        File img = new File("title.png");
+        if (img.exists()) {
+            FXStatic.currentImage.set(new FXImage(new FileImage(img)));
+        }
     }
     
     @Override

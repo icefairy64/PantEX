@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.MapChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -63,6 +64,17 @@ public class CollectionsController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         collectionsList.getItems().addAll(FXCollection.dictionary.values());
         collectionsList.getSelectionModel().select(0);
+        
+        FXCollection.dictionary.addListener((MapChangeListener<Integer, FXCollection>)(x) -> {
+            Platform.runLater(() -> {
+                if (x.wasRemoved()) {
+                    collectionsList.getItems().remove(x.getValueRemoved());
+                }
+                else if (x.wasAdded()) {
+                    collectionsList.getItems().add(x.getValueAdded());
+                }
+            });
+        });
         
         imagesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         imagesList.itemsProperty().bind(Bindings.createObjectBinding(() ->
@@ -146,6 +158,7 @@ public class CollectionsController implements Initializable {
 
     @FXML
     private void closeClick(ActionEvent event) {
+        progressIndicator.getScene().getWindow().hide();
     }
     
     private void indicateProgressStart() {
@@ -166,7 +179,10 @@ public class CollectionsController implements Initializable {
     private void load(Importer imp) {
         try {
             FXCollection col = FXCollection.create("");
-            imp.afterImport((x) -> Platform.runLater(() -> { indicateProgressEnd(); collectionsList.getItems().add(col); }))
+            imp.afterImport((x) -> Platform.runLater(() -> {
+                        FXCollection.dictionary.put(col.index, col);
+                        indicateProgressEnd();
+                    }))
                     .onImportProgress((c, t) -> Platform.runLater(() -> progressIndicator.setProgress((double)c / t)))
                     .load(col);
         }
@@ -177,6 +193,12 @@ public class CollectionsController implements Initializable {
 
     @FXML
     private void addClick(ActionEvent event) {
+        event.consume();
+        TextInputDialog d = new TextInputDialog();
+        d.getDialogPane().getScene().getStylesheets().add(getClass().getResource("default.css").toString());
+        d.getDialogPane().getStyleClass().add("dialog-pane");
+        d.setContentText("Enter new collection name:");
+        d.showAndWait().ifPresent((x) -> FXCollection.createAndAdd(x));
     }
 
     @FXML
@@ -184,7 +206,6 @@ public class CollectionsController implements Initializable {
         FXCollection col = collectionsList.getSelectionModel().getSelectedItem();
         if (col != null) {
             FXCollection.dictionary.remove(col.index);
-            collectionsList.getItems().remove(col);
         }
     }
 

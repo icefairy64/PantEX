@@ -67,9 +67,19 @@ public class FXCollection extends Collection {
         return res;
     }
     
-    public static FXCollection create(String title) {
+    /**
+     * Creates a collection and adds it to dictionary
+     * @param title
+     * @return 
+     */
+    public static FXCollection createAndAdd(String title) {
         FXCollection col = new FXCollection(title);
         dictionary.put(col.index, col);
+        return col;
+    }
+    
+    public static FXCollection create(String title) {
+        FXCollection col = new FXCollection(title);
         return col;
     }
 

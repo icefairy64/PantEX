@@ -21,6 +21,14 @@ public class FileImage extends EXImage {
     
     public File file;
     
+    public FileImage(String fileName) {
+        this(new File(fileName));
+    }
+    
+    public FileImage(File file) {
+        this(file, null, file.getName(), null);
+    }
+    
     public FileImage(String fileName, Collection collection, String title, List<Tag> tags) {
         this(new File(fileName), collection, title, tags);
     }

@@ -20,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +90,8 @@ public class YandexDiskPlugin extends Plugin {
         }
 
         public static String getFileUrl(String path, YandexToken token) throws IOException {
-            JsonObject root = new JsonParser().parse(Util.fetchHttpContent(String.format(downloadUrl, path), new String[] { "Authorization", "OAuth " + token.getToken() }))
+            String content = Util.fetchHttpContent(String.format(downloadUrl, path), new String[] { "Authorization", "OAuth " + token.getToken() });
+            JsonObject root = new JsonParser().parse(content)
                     .getAsJsonObject();
             try {
                 return root.get("href").getAsString();
@@ -131,10 +133,11 @@ public class YandexDiskPlugin extends Plugin {
                                 // Loading
                                 if (r.isPresent()) {
                                     col.title = r.get();
-                                    String path = "app:/" + r.get() + "/collection.json";
+                                    String rpath = URLEncoder.encode(r.get());
+                                    String path = "app:/" + rpath + "/collection.json";
                                     JSONPack.load(col, new InputStreamReader(getFileStream(path, token)),
                                             (title) -> {
-                                                EXImage img = new YandexImage("app:/" + r.get() + "/" + title, token, col, title, null);
+                                                EXImage img = new YandexImage("app:/" + rpath + "/" + title, token, col, title, null);
                                                 //EXImage img = new RemoteImage(getFileUrl("app:/" + r.get() + "/" + title, token), col, null);
                                                 img.title = title;
                                                 return img;

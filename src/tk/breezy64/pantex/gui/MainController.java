@@ -101,6 +101,11 @@ public class MainController implements Initializable {
             FXStatic.executor.submit(() -> { Image x = nV.get(); onImageLoaded(x); });
         });
         
+        if (FXStatic.currentImage.get() != null) {
+            image.setImage(FXStatic.currentImage.get().get());
+            imageStackPane.setPrefHeight(image.getImage().getHeight() * (vBox.getPrefWidth() / image.getImage().getWidth()));
+        }
+        
         refreshSources();
     }    
 
