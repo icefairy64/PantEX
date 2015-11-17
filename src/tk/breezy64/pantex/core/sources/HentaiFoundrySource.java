@@ -10,10 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import tk.breezy64.pantex.core.Cache;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.HentaiFoundryImage;
-import tk.breezy64.pantex.core.RemoteImage;
 import tk.breezy64.pantex.core.Util;
 
 /**

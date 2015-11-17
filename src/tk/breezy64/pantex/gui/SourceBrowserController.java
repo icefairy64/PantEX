@@ -24,6 +24,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -138,6 +139,10 @@ public class SourceBrowserController implements Initializable {
             view.setOnMouseClicked((e) -> {
                 if (e.getClickCount() == 2) {
                     collectionSelector.getSelectionModel().getSelectedItem().addImage(img);
+                }
+                
+                if (e.getButton() == MouseButton.SECONDARY) {
+                    FXStatic.currentImage.set(new FXImage((EXImage)view.getUserData()));
                 }
                 e.consume();
             });
