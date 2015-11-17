@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="414.0" prefWidth="512.0" spacing="8.0" styleClass="pane" stylesheets="@../css/default.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tk.breezy64.pantex.gui.CollectionsController">
+   <padding>
+      <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+   </padding>
+   <children>
+      <SplitPane dividerPositions="0.5" styleClass="pane-borderless" VBox.vgrow="SOMETIMES">
+         <items>
+            <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0" HBox.hgrow="SOMETIMES">
+               <children>
+                  <Label text="Collections:">
+                     <padding>
+                        <Insets left="4.0" right="4.0" top="2.0" />
+                     </padding></Label>
+                  <ListView fx:id="collectionsList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES" />
+               </children>
+            </VBox>
+            <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0" HBox.hgrow="SOMETIMES">
+               <children>
+                  <Label text="Images:">
+                     <padding>
+                        <Insets left="4.0" right="4.0" top="2.0" />
+                     </padding></Label>
+                  <ListView fx:id="imagesList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
+                     <contextMenu>
+                        <ContextMenu fx:id="cM">
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#removeImagesClick" text="Remove" />
+                              <MenuItem mnemonicParsing="false" onAction="#moveImagesClick" text="Move to..." />
+                              <MenuItem mnemonicParsing="false" onAction="#exportImagesClick" text="Export..." />
+                          </items>
+                        </ContextMenu>
+                     </contextMenu></ListView>
+               </children>
+            </VBox>
+         </items>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </SplitPane>
+      <HBox alignment="CENTER_RIGHT" prefHeight="37.0" prefWidth="541.0" spacing="8.0">
+         <children>
+            <ProgressIndicator fx:id="progressIndicator" progress="0.0" visible="false">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <HBox.margin>
+                  <Insets bottom="4.0" top="4.0" />
+               </HBox.margin>
+            </ProgressIndicator>
+            <MenuButton fx:id="importButton" minWidth="-Infinity" mnemonicParsing="false" text="Import" />
+            <MenuButton fx:id="exportButton" minWidth="-Infinity" mnemonicParsing="false" text="Export" />
+            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#renameClick" text="Rename" />
+            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#addClick" text="Add" />
+            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#removeClick" text="Remove" />
+            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#closeClick" text="Close" />
+         </children>
+         <padding>
+            <Insets bottom="4.0" right="2.0" />
+         </padding>
+      </HBox>
+   </children>
+</VBox>
