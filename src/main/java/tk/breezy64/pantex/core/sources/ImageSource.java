@@ -62,6 +62,14 @@ public abstract class ImageSource implements Iterator<EXImage[]>, ExtensionPoint
         cache = null;
         return result;
     }
+
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
     
     public ImageSource onException(Consumer<Exception> handler) {
         this.exceptionHandler = handler;

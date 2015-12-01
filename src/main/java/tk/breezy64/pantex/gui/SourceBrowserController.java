@@ -16,10 +16,12 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -38,6 +40,7 @@ public class SourceBrowserController implements Initializable {
     
     private ImageSource src;
     private IntegerProperty thumbSize;
+    private int lastPage;
     
     @FXML
     private FlowPane flowPane;
@@ -57,6 +60,10 @@ public class SourceBrowserController implements Initializable {
     private AnchorPane bottomPanel;
     @FXML
     private HBox leftHBox;
+    @FXML
+    private TextField page;
+    @FXML
+    private Button fetchButton;
     
     /**
      * Initializes the controller class.
@@ -86,7 +93,20 @@ public class SourceBrowserController implements Initializable {
             src.onException((x) -> FXStatic.handleException(x));
         }
         
+        int curPage = lastPage;
+        try {
+            curPage = Integer.parseInt(page.getText());
+        }
+        catch (NumberFormatException e) {
+            
+        }
+        
+        if (lastPage != curPage) {
+            src.setPage(curPage);
+        }
+        
         indicateProgressStart();
+        fetchButton.setDisable(true);
         FXStatic.executor.submit(() -> fetch());
     }
     
@@ -105,6 +125,9 @@ public class SourceBrowserController implements Initializable {
             FXStatic.handleException(e);
         }
         
+        lastPage = src.getPage();
+        page.setText(String.valueOf(lastPage));
+        fetchButton.setDisable(false);
         indicateProgressEnd();
     }
     
@@ -127,7 +150,7 @@ public class SourceBrowserController implements Initializable {
     
     private void fetchImage(EXImage img) {
         try {
-            ImageView view = new ImageView(new Image(img.thumb.getImageStream()));
+            ImageView view = new ImageView(new Image(img.getThumb().getImageStream()));
             view.setPreserveRatio(true);
             //view.fitWidthProperty().bind(thumbSize);
             view.fitHeightProperty().bind(thumbSize);

@@ -9,3 +9,6 @@
 /src/tk/breezy64/pantex/gui/*.otf
 **/*.log
 **/*.jar
+/PantEX-backup/YandexDisk/build/
+/PantEX-backup/YandexDisk/nbproject/private/
+*.pantex

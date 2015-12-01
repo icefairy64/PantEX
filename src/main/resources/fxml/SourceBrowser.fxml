@@ -8,7 +8,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="BOTTOM_LEFT" prefHeight="444.0" prefWidth="676.0" spacing="8.0" styleClass="pane-borderless" stylesheets="@../css/default.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tk.breezy64.pantex.gui.SourceBrowserController">
+<VBox alignment="BOTTOM_LEFT" prefHeight="500.0" prefWidth="761.0" spacing="8.0" styleClass="pane-borderless" stylesheets="@../css/default.css" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tk.breezy64.pantex.gui.SourceBrowserController">
    <children>
       <StackPane prefHeight="150.0" prefWidth="200.0" styleClass="pane-container" VBox.vgrow="ALWAYS">
          <children>
@@ -37,7 +37,7 @@
          <children>
             <HBox fx:id="leftHBox" alignment="CENTER_LEFT" layoutX="0.0380859375" prefHeight="30.0" spacing="8.0" AnchorPane.leftAnchor="0.0">
                <children>
-                  <Label prefHeight="15.0" text="Target collection:" />
+                  <Label prefHeight="15.0" text="Collection:" />
                   <ComboBox fx:id="collectionSelector" prefWidth="150.0" promptText="Select..." />
                </children>
             </HBox>
@@ -45,7 +45,9 @@
                <children>
                   <Label minWidth="-Infinity" text="Thumb size" />
                   <Slider fx:id="thumbSizeSlider" max="250.0" min="50.0" value="100.0" />
-                  <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#fetchClick" text="Fetch more" />
+                  <Label text="Page:" />
+                  <TextField fx:id="page" alignment="CENTER_RIGHT" prefHeight="29.0" prefWidth="36.0" text="0" />
+                  <Button fx:id="fetchButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#fetchClick" text="Fetch more" />
                   <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#closeClick" text="Close" />
                </children>
             </HBox>

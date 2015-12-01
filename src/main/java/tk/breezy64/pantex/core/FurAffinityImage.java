@@ -25,7 +25,6 @@ public class FurAffinityImage extends EXImage {
         super(null, null, null);
         this.sub = s;
         this.thumb = new RemoteImage(s.getThumbUrl());
-        this.title = s.getTitle();
     }
 
     private void load() throws IOException {
@@ -33,6 +32,7 @@ public class FurAffinityImage extends EXImage {
             try {
                 sub.update();
                 back = new RemoteImage(sub.getFullUrl());
+                title = back.title;
             }
             catch (DataException e) {
                 throw new RuntimeException(e);

@@ -6,14 +6,12 @@
 package tk.breezy64.pantex.gui;
 
 import java.io.File;
-import java.net.URL;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import tk.breezy64.pantex.core.ConfigManager;
 import tk.breezy64.pantex.core.FileImage;
-import tk.breezy64.pantex.core.ImgurHelper;
 import tk.breezy64.pantex.core.Static;
 
 /**

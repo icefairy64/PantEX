@@ -5,12 +5,15 @@
  */
 package tk.breezy64.pantex.core;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import javax.imageio.ImageIO;
+import org.imgscalr.Scalr;
 import ro.fortsoft.pf4j.ExtensionPoint;
 
 /**
@@ -18,6 +21,10 @@ import ro.fortsoft.pf4j.ExtensionPoint;
  * @author icefairy64
  */
 public abstract class EXImage implements ExtensionPoint {
+    
+    public static final int THUMB_SIZE = 150;
+    public static final String THUMB_FORMAT = "PNG";
+    
     public List<Tag> tags;
     public Collection collection;
     public String title;
@@ -37,8 +44,32 @@ public abstract class EXImage implements ExtensionPoint {
         return title;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof EXImage ? false :
+                ((EXImage)obj).title.equals(this.title);
+    }
+
     public void setCollection(Collection collection) {
         this.collection = collection;
+    }
+    
+    public EXImage getThumb() throws IOException {
+        if (thumb != null)
+            return thumb;
+        
+        InputStream str = getImageStream();
+        BufferedImage img = ImageIO.read(str);
+        if (img == null)
+            return null;
+        
+        BufferedImage sc = Scalr.resize(img, THUMB_SIZE);
+        SavedStream buf = new SavedStream();
+        ImageIO.write(sc, THUMB_FORMAT, buf.getWriter());
+        buf.endWriting();
+        thumb = new StreamImage(buf, null, null, buf.available(), null);
+        str.close();
+        return thumb;
     }
     
     public abstract InputStream getImageStream() throws IOException;

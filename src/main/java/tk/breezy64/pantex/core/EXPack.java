@@ -34,7 +34,7 @@ public class EXPack {
     //@Override
     public void load(File file, Collection res, BiConsumer<Integer, Integer> progressHandler) throws IOException, ImportException {
         if (!file.exists() || !file.isFile()) {
-            throw new FileNotFoundException(String.format("EXPack is not found at path %s", file.getPath()));
+            throw new FileNotFoundException(String.format("EXPack file is not found at path %s", file.getPath()));
         }
         
         FileInputStream f = new FileInputStream(file);
@@ -60,12 +60,14 @@ public class EXPack {
         int imgCount = Util.readInt(ch);
 
         int[] imgSizes = new int[imgCount];
+        int[] thumbSizes = new int[imgCount];
         List<List<Tag>> imgTags = new ArrayList<>(imgCount);
         String[] imgTitles = new String[imgCount];
         
         for (int i = 0; i < imgCount; i++) {
             // Size
             imgSizes[i] = Util.readInt(ch);
+            thumbSizes[i] = Util.readInt(ch);
             
             // Tags
             int imgTagCount = Util.readInt(ch);
@@ -94,6 +96,13 @@ public class EXPack {
             
             offset += imgSizes[i];
         }
+        
+        EXImage[] imgs = res.getImages();
+        for (int i = 0; i < imgCount; i++) {
+            if (thumbSizes[i] > 0)
+                imgs[i].thumb = new StreamImage(new ImageStream(ch, offset, thumbSizes[i]), null, null, thumbSizes[i], null);
+            offset += thumbSizes[i];
+        }
     }
     
     public void write(Collection col, File file, BiConsumer<Integer, Integer> progressHandler) throws IOException {
@@ -119,6 +128,8 @@ public class EXPack {
         int i = 0;
         for (EXImage img : imgs) {
             Util.writeInt(ch, img.getImageSize());
+            EXImage th = img.getThumb();
+            Util.writeInt(ch, th == null ? 0 : th.getImageSize());
             
             List<Tag> itags = img.tags;
             Util.writeInt(ch, itags.size());
@@ -135,6 +146,12 @@ public class EXPack {
         
         for (EXImage img : imgs) {
             img.writeImage(out);
+        }
+        
+        for (EXImage img : imgs) {
+            EXImage th = img.getThumb();
+            if (th != null)
+                th.writeImage(out);
         }
         
         out.close();

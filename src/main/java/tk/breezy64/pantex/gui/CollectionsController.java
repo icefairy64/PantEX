@@ -5,7 +5,6 @@
  */
 package tk.breezy64.pantex.gui;
 
-import com.sun.javafx.collections.ObservableListWrapper;
 import tk.breezy64.pantex.core.EXPack;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,20 +16,22 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.MapChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.SelectionMode;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.FlowPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import tk.breezy64.pantex.core.EXImage;
@@ -46,16 +47,23 @@ import tk.breezy64.pantex.core.Static;
 public class CollectionsController implements Initializable {
     @FXML
     private ListView<FXCollection> collectionsList;
-    @FXML
     private ListView<FXImage> imagesList;
     @FXML
     private ProgressIndicator progressIndicator;
     @FXML
-    private ContextMenu cM;
-    @FXML
     private MenuButton importButton;
     @FXML
     private MenuButton exportButton;
+    @FXML
+    private FlowPane imagesGrid;
+    @FXML
+    private ScrollPane scrollPane;
+    
+    private static final int LOAD_THRESHOLD = 300;
+    private static final int LOAD_SIZE = 12;
+    
+    private boolean adding = false;
+    private int pos = 0;
 
     /**
      * Initializes the controller class.
@@ -76,14 +84,31 @@ public class CollectionsController implements Initializable {
             });
         });
         
-        imagesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        collectionsList.getSelectionModel().selectedItemProperty().addListener((ChangeListener<FXCollection>)(x, oV, nV) -> {
+            pos = 0;
+            adding = false;
+            scrollPane.setVvalue(scrollPane.getVmax());
+            imagesGrid.getChildren().clear();
+        });
+        
+        /*imagesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         imagesList.itemsProperty().bind(Bindings.createObjectBinding(() ->
                 collectionsList.getSelectionModel().getSelectedItem() == null ?
                     new ObservableListWrapper<>(new ArrayList<>()) :
                     new ObservableListWrapper<>(collectionsList.getSelectionModel().getSelectedItem().images.values().stream().collect(Collectors.toList())),
                 collectionsList.getSelectionModel().selectedItemProperty(), collectionsList.getSelectionModel().getSelectedItem().images, FXStatic.images));
         imagesList.getSelectionModel().selectedItemProperty().addListener((ChangeListener<FXImage>)(x, oV, nV) -> 
-                FXStatic.currentImage.set(nV));
+                FXStatic.currentImage.set(nV));*/
+        
+        imagesGrid.prefWidthProperty().bind(scrollPane.widthProperty());
+        
+        scrollPane.vvalueProperty().addListener((ChangeListener<Number>)(x, oV, nV) -> {
+            System.out.println(nV.toString());
+            FXCollection col = collectionsList.getSelectionModel().getSelectedItem();
+            if (!adding && col != null && nV.doubleValue() >= scrollPane.getVmax() - (LOAD_THRESHOLD / imagesGrid.getHeight())) {
+                addWhileVisible(col.getImages(), pos);
+            }
+        });
         
         // Filling import/export buttons
         
@@ -95,7 +120,52 @@ public class CollectionsController implements Initializable {
         exportButton.getItems().addAll(Static.pluginManager.getExtensions(Exporter.class).stream()
                 .map((x) -> createExportItem(x)).collect(Collectors.toList()));
     }
-   
+    
+    private void addWhileVisible(EXImage[] imgs, int index) {
+        if (scrollPane.getVvalue() >= scrollPane.getVmax() - (LOAD_THRESHOLD / imagesGrid.getHeight()) && index < imgs.length) {
+            adding = true;
+            for (int i = 0; i < Integer.min(LOAD_SIZE, imgs.length - index); i++) {
+                final int z = i;
+                FXStatic.executor.submit(() -> {
+                    addImage(imgs[index + z]);
+                    pos = index + LOAD_SIZE;
+                    if (z == LOAD_SIZE - 1) {
+                        Platform.runLater(() -> addWhileVisible(imgs, index + LOAD_SIZE));
+                    }
+                });
+            }
+        } else {
+            adding = false;
+        }
+    }
+    
+    private void addImage(EXImage img) {
+        try {
+            ImageView view = new ImageView(new Image(img.getThumb().getImageStream()));
+            view.setPreserveRatio(true);
+            //view.fitHeightProperty().bind(thumbSize);
+            view.setFitHeight(100);
+            view.setUserData(img);
+            view.setCache(true);
+
+            view.setOnMouseClicked((e) -> {
+                /*if (e.getClickCount() == 2) {
+                    collectionSelector.getSelectionModel().getSelectedItem().addImage(img);
+                }*/
+                
+                if (e.getButton() == MouseButton.SECONDARY) {
+                    FXStatic.currentImage.set(new FXImage((EXImage)view.getUserData()));
+                }
+                e.consume();
+            });
+
+            Platform.runLater(() -> imagesGrid.getChildren().add(view));
+        }
+        catch (IOException e) {
+            FXStatic.handleException(e);
+        }
+    }    
+    
     private MenuItem createImportItem(Importer x) {
         MenuItem item = new MenuItem(x.getTitle());
             item.setOnAction((ev) -> {
@@ -209,7 +279,6 @@ public class CollectionsController implements Initializable {
         }
     }
 
-    @FXML
     private void removeImagesClick(ActionEvent event) {
         for (FXImage img : imagesList.getSelectionModel().getSelectedItems()) {
             img.getEXImage().collection.removeImage(img.getEXImage());
@@ -218,7 +287,6 @@ public class CollectionsController implements Initializable {
         event.consume();
     }
 
-    @FXML
     private void moveImagesClick(ActionEvent event) throws IOException {
         ChoiceDialog<FXCollection> dialog = new ChoiceDialog<>(FXCollection.defaultCollection, FXCollection.dictionary.values());
         dialog.setHeaderText("Choose a collection");
@@ -233,7 +301,6 @@ public class CollectionsController implements Initializable {
         event.consume();
     }
 
-    @FXML
     private void exportImagesClick(ActionEvent event) {
         DirectoryChooser dialog = new DirectoryChooser();
         dialog.setTitle("Choose a directory");

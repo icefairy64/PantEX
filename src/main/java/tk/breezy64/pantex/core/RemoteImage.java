@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +22,8 @@ public class RemoteImage extends EXImage {
     protected String url;
     protected FileImage local;
     
+    private final List<String[]> headers;
+    
     public RemoteImage(String url) {
         this(url, null, null);
     }
@@ -29,6 +32,7 @@ public class RemoteImage extends EXImage {
         super(collection, url.substring(url.lastIndexOf("/") + 1, url.length()), tags);
         
         this.url = url;
+        this.headers = new ArrayList<>();
     }
     
     @Override
@@ -39,13 +43,17 @@ public class RemoteImage extends EXImage {
         return local.getImageStream();
     }
     
+    public void addHeader(String header, String value) {
+        headers.add(new String[] { header, value });
+    }
+    
     private void load() {
         try {
             String ext = url.substring(url.lastIndexOf("."), url.length());
             File file = File.createTempFile("PantEX", ext);
             file.deleteOnExit();
 
-            InputStream in = Util.fetchHttpStream(url);
+            InputStream in = Util.fetchHttpStream(url, headers.toArray(new String[0][0]));
             FileOutputStream out = new FileOutputStream(file);
             Util.copy(in, out);
             out.close();

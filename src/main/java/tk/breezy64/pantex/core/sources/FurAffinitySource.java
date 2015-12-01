@@ -13,7 +13,6 @@ import tk.breezy64.fur.Submission;
 import tk.breezy64.fur.SubmissionIterator;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.FurAffinityImage;
-import tk.breezy64.pantex.core.RemoteImage;
 
 /**
  *

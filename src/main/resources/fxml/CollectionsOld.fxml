@@ -8,37 +8,38 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="585.0" prefWidth="762.0" spacing="8.0" styleClass="pane" stylesheets="@../css/default.css" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tk.breezy64.pantex.gui.CollectionsController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="414.0" prefWidth="512.0" spacing="8.0" styleClass="pane" stylesheets="@../css/default.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tk.breezy64.pantex.gui.CollectionsController">
    <padding>
       <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
    </padding>
    <children>
-      <SplitPane dividerPositions="0.2680965147453083" styleClass="pane-borderless" VBox.vgrow="SOMETIMES">
+      <SplitPane dividerPositions="0.5" styleClass="pane-borderless" VBox.vgrow="SOMETIMES">
          <items>
             <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0" HBox.hgrow="SOMETIMES">
                <children>
+                  <Label text="Collections:">
+                     <padding>
+                        <Insets left="4.0" right="4.0" top="2.0" />
+                     </padding></Label>
                   <ListView fx:id="collectionsList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES" />
                </children>
             </VBox>
-            <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0" styleClass="pane-container" HBox.hgrow="SOMETIMES">
+            <VBox prefHeight="200.0" prefWidth="100.0" spacing="8.0" HBox.hgrow="SOMETIMES">
                <children>
-                  <ScrollPane fx:id="scrollPane" VBox.vgrow="ALWAYS">
-                     <content>
-                        <FlowPane fx:id="imagesGrid" hgap="4.0" prefHeight="200.0" prefWidth="200.0" vgap="4.0">
-                           <styleClass>
-                              <String fx:value="pane-container" />
-                              <String fx:value="borderless" />
-                           </styleClass>
-                           <padding>
-                              <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
-                           </padding>
-                        </FlowPane>
-                     </content>
-                     <styleClass>
-                        <String fx:value="pane-transparent" />
-                        <String fx:value="borderless" />
-                     </styleClass>
-                  </ScrollPane>
+                  <Label text="Images:">
+                     <padding>
+                        <Insets left="4.0" right="4.0" top="2.0" />
+                     </padding></Label>
+                  <ListView fx:id="imagesList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
+                     <contextMenu>
+                        <ContextMenu fx:id="cM">
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#removeImagesClick" text="Remove" />
+                              <MenuItem mnemonicParsing="false" onAction="#moveImagesClick" text="Move to..." />
+                              <MenuItem mnemonicParsing="false" onAction="#exportImagesClick" text="Export..." />
+                          </items>
+                        </ContextMenu>
+                     </contextMenu></ListView>
                </children>
             </VBox>
          </items>

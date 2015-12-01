@@ -16,10 +16,10 @@ import java.util.List;
  */
 public class StreamImage extends EXImage {
 
-    protected ImageStream stream;
+    protected InputStream stream;
     protected int expectedSize;
     
-    public StreamImage(ImageStream stream, Collection collection, String title, int expectedSize, List<Tag> tags) {
+    public StreamImage(InputStream stream, Collection collection, String title, int expectedSize, List<Tag> tags) {
         super(collection, title, tags);
         
         this.stream = stream;
