@@ -5,7 +5,10 @@
  */
 package tk.breezy64.pantex.core;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,6 +47,13 @@ public class SimpleCollection extends Collection {
     @Override
     public EXImage[] getImages() {
         return images.values().toArray(new EXImage[0]);
+    }
+    
+    @Override
+    public EXImage[] getImagesReverse() {
+        List<EXImage> imgs = new ArrayList<>(images.values());
+        Collections.reverse(imgs);
+        return imgs.toArray(new EXImage[0]);
     }
 
     @Override

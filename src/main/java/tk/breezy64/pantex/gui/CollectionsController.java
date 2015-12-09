@@ -106,7 +106,7 @@ public class CollectionsController implements Initializable {
             System.out.println(nV.toString());
             FXCollection col = collectionsList.getSelectionModel().getSelectedItem();
             if (!adding && col != null && nV.doubleValue() >= scrollPane.getVmax() - (LOAD_THRESHOLD / imagesGrid.getHeight())) {
-                addWhileVisible(col.getImages(), pos);
+                addWhileVisible(col.getImagesReverse(), pos);
             }
         });
         

@@ -37,6 +37,7 @@ public abstract class Collection {
     }
     
     public abstract EXImage[] getImages();
+    public abstract EXImage[] getImagesReverse();
     public abstract void addImage(EXImage img);
     public abstract void removeImage(EXImage img);
     
