@@ -31,12 +31,14 @@ public abstract class EXImage implements ExtensionPoint {
     public EXImage thumb;
     public int index;
     public long id;
+    public boolean imported;
 
     protected EXImage(Collection collection, String title, List<Tag> tags) {
         this.tags = tags == null ? new LinkedList<>() : tags;
         this.collection = collection;
         this.title = title;
         this.id = (new Date().toString() + title).hashCode();
+        this.imported = false;
     }
 
     @Override

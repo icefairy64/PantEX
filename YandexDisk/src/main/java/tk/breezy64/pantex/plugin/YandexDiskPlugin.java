@@ -97,6 +97,7 @@ public class YandexDiskPlugin extends Plugin {
                 return root.get("href").getAsString();
             }
             catch (NullPointerException e) {
+                System.out.println(content);
                 throw new RuntimeException("No URL received", e);
             }
         }
@@ -139,6 +140,7 @@ public class YandexDiskPlugin extends Plugin {
                                             (title) -> {
                                                 EXImage img = new YandexImage("app:/" + rpath + "/" + title, token, col, title, null, client);
                                                 img.title = title;
+                                                img.imported = true;
                                                 return img;
                                             }, importProgressHandler.orElse(null));
                                 } else {
@@ -178,13 +180,10 @@ public class YandexDiskPlugin extends Plugin {
                                 if (!getResources(client, "app:/").stream().anyMatch((x) -> x.getName().equals(col.title))) {
                                     client.makeFolder(path);
                                 }
-                                if (!getResources(client, path).stream().anyMatch((x) -> x.getName().equals("thumbs"))) {
-                                    client.makeFolder(path + "/thumbs");
-                                }
                                 
-                                List<String> ignore = getResources(client, path)
+                                /*List<String> ignore = getResources(client, path)
                                         .stream().map((x) -> x.getName())
-                                        .collect(Collectors.toList());
+                                        .collect(Collectors.toList());*/
                                 
                                 /*List<String> thumbIgnore = getResources(client, path + "/thumbs")
                                         .stream().map((x) -> x.getName())
@@ -195,7 +194,7 @@ public class YandexDiskPlugin extends Plugin {
                                 JSONPack.write(col, new FileWriter(j), (x) -> {
                                     try {
                                         try {
-                                            if (!ignore.contains(x.title)) {
+                                            if (!x.imported /*!ignore.contains(x.title)*/) {
                                                 Link link = client.getUploadLink(path + "/" + x.title, false);
                                                 File f = File.createTempFile("PantEX", "_" + x.title);
                                                 f.deleteOnExit();
