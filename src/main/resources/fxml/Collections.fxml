@@ -56,11 +56,19 @@
                   <Insets bottom="4.0" top="4.0" />
                </HBox.margin>
             </ProgressIndicator>
+            <Label fx:id="imageCountLabel" text="Images: 0" visible="false" />
             <MenuButton fx:id="importButton" minWidth="-Infinity" mnemonicParsing="false" text="Import" />
             <MenuButton fx:id="exportButton" minWidth="-Infinity" mnemonicParsing="false" text="Export" />
-            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#renameClick" text="Rename" />
-            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#addClick" text="Add" />
-            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#removeClick" text="Remove" />
+            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#renameClick" text="Rename collection" />
+            <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#addClick" text="Add collection" />
+            <MenuButton fx:id="selectedButton" mnemonicParsing="false" text="Selected...">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#removeImagesClick" text="Remove" />
+                  <MenuItem mnemonicParsing="false" onAction="#moveImagesClick" text="Move..." />
+                <MenuItem mnemonicParsing="false" text="Copy..." />
+                  <MenuItem mnemonicParsing="false" onAction="#exportImagesClick" text="Export..." />
+              </items>
+            </MenuButton>
             <Button minWidth="-Infinity" mnemonicParsing="false" onAction="#closeClick" text="Close" />
          </children>
          <padding>

@@ -22,6 +22,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -45,6 +46,13 @@ import tk.breezy64.pantex.core.Static;
  * @author icefairy64
  */
 public class CollectionsController implements Initializable {
+    
+    private static final int LOAD_THRESHOLD = 300;
+    private static final int LOAD_SIZE = 12;
+    
+    private boolean adding = false;
+    private int pos = 0;
+    
     @FXML
     private ListView<FXCollection> collectionsList;
     private ListView<FXImage> imagesList;
@@ -58,12 +66,8 @@ public class CollectionsController implements Initializable {
     private FlowPane imagesGrid;
     @FXML
     private ScrollPane scrollPane;
-    
-    private static final int LOAD_THRESHOLD = 300;
-    private static final int LOAD_SIZE = 12;
-    
-    private boolean adding = false;
-    private int pos = 0;
+    @FXML
+    private Label imageCountLabel;
 
     /**
      * Initializes the controller class.
@@ -87,6 +91,8 @@ public class CollectionsController implements Initializable {
         collectionsList.getSelectionModel().selectedItemProperty().addListener((ChangeListener<FXCollection>)(x, oV, nV) -> {
             pos = 0;
             adding = false;
+            imageCountLabel.setVisible(true);
+            imageCountLabel.setText(String.format("Images: %d", nV.images.size()));
             scrollPane.setVvalue(scrollPane.getVmax());
             imagesGrid.getChildren().clear();
         });
@@ -283,7 +289,7 @@ public class CollectionsController implements Initializable {
         for (FXImage img : imagesList.getSelectionModel().getSelectedItems()) {
             img.getEXImage().collection.removeImage(img.getEXImage());
         }
-        
+
         event.consume();
     }
 
