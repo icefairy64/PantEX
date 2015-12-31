@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -55,7 +56,6 @@ public class CollectionsController implements Initializable {
     
     @FXML
     private ListView<FXCollection> collectionsList;
-    private ListView<FXImage> imagesList;
     @FXML
     private ProgressIndicator progressIndicator;
     @FXML
@@ -68,12 +68,16 @@ public class CollectionsController implements Initializable {
     private ScrollPane scrollPane;
     @FXML
     private Label imageCountLabel;
+    
+    private List<ThumbBox> selection;
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        selection = new ArrayList<>();
+        
         collectionsList.getItems().addAll(FXCollection.dictionary.values());
         collectionsList.getSelectionModel().select(0);
         
@@ -118,11 +122,9 @@ public class CollectionsController implements Initializable {
         
         // Filling import/export buttons
         
-        //importButton.getItems().add(createImportItem(EXPackWrapper.getInstance()));
         importButton.getItems().addAll(Static.pluginManager.getExtensions(Importer.class).stream()
                 .map((x) -> createImportItem(x)).collect(Collectors.toList()));
         
-        //exportButton.getItems().add(createExportItem(EXPackWrapper.getInstance()));
         exportButton.getItems().addAll(Static.pluginManager.getExtensions(Exporter.class).stream()
                 .map((x) -> createExportItem(x)).collect(Collectors.toList()));
     }
@@ -147,25 +149,41 @@ public class CollectionsController implements Initializable {
     
     private void addImage(EXImage img) {
         try {
-            ImageView view = new ImageView(new Image(img.getThumb().getImageStream()));
+            ThumbBox box = ThumbBox.create();
+            box.setImage(new FXImage(img));
+            ImageView view = box.getImageBox();
             view.setPreserveRatio(true);
-            //view.fitHeightProperty().bind(thumbSize);
-            view.setFitHeight(100);
-            view.setUserData(img);
+            box.setPrefHeight(100);
             view.setCache(true);
 
             view.setOnMouseClicked((e) -> {
-                /*if (e.getClickCount() == 2) {
-                    collectionSelector.getSelectionModel().getSelectedItem().addImage(img);
-                }*/
+                if (e.getButton() == MouseButton.PRIMARY) {
+                    if (e.isControlDown()) {
+                        box.setSelected(!box.isSelected());
+                    }
+                    else {
+                        for (ThumbBox b : selection) {
+                            if (b != box)
+                                b.setSelected(false);
+                        }
+                        box.setSelected(true);
+                    }
+                    
+                    if (!box.isSelected() && selection.contains(box)) {
+                        selection.remove(box);
+                    }
+                    else if (box.isSelected() && !selection.contains(box))  {
+                        selection.add(box);
+                    }
+                } 
                 
                 if (e.getButton() == MouseButton.SECONDARY) {
-                    FXStatic.currentImage.set(new FXImage((EXImage)view.getUserData()));
+                    FXStatic.currentImage.set(box.getImage());
                 }
                 e.consume();
             });
 
-            Platform.runLater(() -> imagesGrid.getChildren().add(view));
+            Platform.runLater(() -> imagesGrid.getChildren().add(box));
         }
         catch (IOException e) {
             FXStatic.handleException(e);
@@ -204,7 +222,7 @@ public class CollectionsController implements Initializable {
     private void exportClick(ActionEvent event) {
         event.consume();
         FileChooser ch = new FileChooser();
-        File f = ch.showSaveDialog(imagesList.getScene().getWindow());
+        File f = ch.showSaveDialog(exportButton.getScene().getWindow());
         
         indicateProgressStart();
         FXStatic.executor.submit(() -> { 
@@ -246,6 +264,7 @@ public class CollectionsController implements Initializable {
         progressIndicator.setVisible(false);
     }
 
+    @FXML
     private void importClick(ActionEvent event) {
         event.consume();
         indicateProgressStart();
@@ -285,14 +304,16 @@ public class CollectionsController implements Initializable {
         }
     }
 
+    @FXML
     private void removeImagesClick(ActionEvent event) {
-        for (FXImage img : imagesList.getSelectionModel().getSelectedItems()) {
-            img.getEXImage().collection.removeImage(img.getEXImage());
+        for (ThumbBox img : selection) {
+            img.getImage().getEXImage().collection.removeImage(img.getImage().getEXImage());
         }
 
         event.consume();
     }
 
+    @FXML
     private void moveImagesClick(ActionEvent event) throws IOException {
         ChoiceDialog<FXCollection> dialog = new ChoiceDialog<>(FXCollection.defaultCollection, FXCollection.dictionary.values());
         dialog.setHeaderText("Choose a collection");
@@ -300,28 +321,35 @@ public class CollectionsController implements Initializable {
         
         Optional<FXCollection> col = dialog.showAndWait();
         col.ifPresent((x) -> {
-            List<FXImage> l = new ArrayList<>(imagesList.getSelectionModel().getSelectedItems());
+            List<FXImage> l = new ArrayList<>(selection.stream().map(z -> z.getImage()).collect(Collectors.toList()));
             l.forEach((img) -> img.getEXImage().collection.moveImage(img.getEXImage(), x));
         });
         
         event.consume();
     }
 
+    @FXML
     private void exportImagesClick(ActionEvent event) {
         DirectoryChooser dialog = new DirectoryChooser();
         dialog.setTitle("Choose a directory");
-        File dir = dialog.showDialog(imagesList.getScene().getWindow());
+        File dir = dialog.showDialog(exportButton.getScene().getWindow());
         if (dir != null) {
-            imagesList.getSelectionModel().getSelectedItems().stream().forEach((img) -> {
+            indicateProgressStart();
+            final AtomicInteger i = new AtomicInteger();
+            FXStatic.executor.submit(() -> {
+                selection.stream().forEach((img) -> {
                     try {
-                        FileOutputStream s = new FileOutputStream(new File(dir, img.getEXImage().title));
-                        img.getEXImage().writeImage(s);
+                        FileOutputStream s = new FileOutputStream(new File(dir, img.getImage().getEXImage().title));
+                        img.getImage().getEXImage().writeImage(s);
                         s.close();
+                        Platform.runLater(() -> progressIndicator.setProgress(i.incrementAndGet() / (double)selection.size()));
                     }
                     catch (Exception e) {
                         FXStatic.handleException(e);
                     }
                 });
+            });
+            indicateProgressEnd();
         }
     }
     

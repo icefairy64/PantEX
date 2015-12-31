@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.image.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller=".ThumbBox">
-    
-</AnchorPane>
+<fx:root fx:id="rootPane" prefHeight="214.0" prefWidth="210.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <ImageView fx:id="imageBox" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
+      <Polygon fx:id="selectionMarker" fill="DODGERBLUE" layoutX="186.0" layoutY="10.0" rotate="0.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <points>
+          <Double fx:value="-30.0" />
+          <Double fx:value="0.0" />
+          <Double fx:value="0.0" />
+          <Double fx:value="0.0" />
+          <Double fx:value="0.0" />
+          <Double fx:value="30.0" />
+        </points>
+         <rotationAxis>
+            <Point3D x="1.0" y="1.0" z="1.0" />
+         </rotationAxis>
+      </Polygon>
+   </children>
+</fx:root>

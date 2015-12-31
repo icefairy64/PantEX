@@ -16,6 +16,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ProgressIndicator;
@@ -84,6 +85,13 @@ public class SourceBrowserController implements Initializable {
         
         thumbSize = new SimpleIntegerProperty(100);
         thumbSize.bind(thumbSizeSlider.valueProperty());
+        
+        flowPane.getScene().getWindow().setOnHiding((e) -> {
+            for (Node n : flowPane.getChildren()) {
+                ((ThumbBox)n).getImageBox().setImage(null);
+            }
+            e.consume();
+        });
     }    
 
     @FXML
@@ -150,27 +158,34 @@ public class SourceBrowserController implements Initializable {
     
     private void fetchImage(EXImage img) {
         try {
-            ImageView view = new ImageView(new Image(img.getThumb().getImageStream()));
+            ThumbBox box = ThumbBox.create();
+
+            ImageView view = box.getImageBox();
             view.setPreserveRatio(true);
-            //view.fitWidthProperty().bind(thumbSize);
-            view.fitHeightProperty().bind(thumbSize);
+            //box.prefWidthProperty().bind(thumbSize);
+            box.prefHeightProperty().bind(thumbSize);
+            box.setImage(new FXImage(img));
             view.setUserData(img);
             view.setCache(true);
 
-            view.setOnMouseClicked((e) -> {
+            box.setOnMouseClicked((e) -> {
+                if (e.isControlDown() && e.getButton() == MouseButton.PRIMARY) {
+                    box.setSelected(!box.isSelected());
+                } 
+                
                 if (e.getClickCount() == 2) {
                     collectionSelector.getSelectionModel().getSelectedItem().addImage(img);
                 }
                 
                 if (e.getButton() == MouseButton.SECONDARY) {
-                    FXStatic.currentImage.set(new FXImage((EXImage)view.getUserData()));
+                    FXStatic.currentImage.set(box.getImage());
                 }
                 e.consume();
             });
 
-            Platform.runLater(() -> flowPane.getChildren().add(view));
+            Platform.runLater(() -> flowPane.getChildren().add(box));
         }
-        catch (IOException e) {
+        catch (Exception e) {
             FXStatic.handleException(e);
         }
     }    

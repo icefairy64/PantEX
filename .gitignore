@@ -12,3 +12,4 @@
 /PantEX-backup/YandexDisk/build/
 /PantEX-backup/YandexDisk/nbproject/private/
 *.pantex
+/target/
