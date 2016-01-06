@@ -9,10 +9,13 @@ import java.io.IOException;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.sources.ImageSource;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -23,6 +26,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -42,6 +46,7 @@ public class SourceBrowserController implements Initializable {
     private ImageSource src;
     private IntegerProperty thumbSize;
     private int lastPage;
+    private List<ThumbBox> imageList;
     
     @FXML
     private FlowPane flowPane;
@@ -71,6 +76,13 @@ public class SourceBrowserController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        imageList = new ArrayList<>();
+        
+        collectionSelector.getSelectionModel().selectedItemProperty().addListener((ChangeListener<FXCollection>)(v, oV, nV) -> {
+            imageList.stream()
+                    .forEach((ThumbBox x) -> x.setSelected(nV.images.entrySet().stream().anyMatch((z) -> z.getValue().getEXImage().equals(x.getImage().getEXImage()))));
+        });
+        
         flowPane.prefWidthProperty().bind(scrollPane.widthProperty().subtract(2));
         shadeRect.widthProperty().bind(scrollPane.widthProperty());
         shadeRect.heightProperty().bind(scrollPane.heightProperty());
@@ -86,17 +98,28 @@ public class SourceBrowserController implements Initializable {
         thumbSize = new SimpleIntegerProperty(100);
         thumbSize.bind(thumbSizeSlider.valueProperty());
         
-        flowPane.getScene().getWindow().setOnHiding((e) -> {
-            for (Node n : flowPane.getChildren()) {
-                ((ThumbBox)n).getImageBox().setImage(null);
+        fetchButton.setOnMouseClicked((e) -> {
+            if (e.getButton() == MouseButton.SECONDARY) {
+                e.consume();
+                TextInputDialog d = new TextInputDialog();
+                d.setHeaderText("Fetch");
+                d.setContentText("Pages to fetch:");
+                FXStatic.applyCss(d.getDialogPane(), "dialog-pane");
+                d.showAndWait().ifPresent((s) -> {
+                    int x = Integer.parseInt(s);
+                    fetch(x);
+                });
             }
-            e.consume();
         });
     }    
 
     @FXML
     private void fetchClick(ActionEvent event) {
-        if (src == null) {
+        fetch(1);
+    }
+    
+    private void fetch(int count) {
+         if (src == null) {
             src = (ImageSource)flowPane.getScene().getUserData();
             src.onException((x) -> FXStatic.handleException(x));
         }
@@ -115,7 +138,13 @@ public class SourceBrowserController implements Initializable {
         
         indicateProgressStart();
         fetchButton.setDisable(true);
-        FXStatic.executor.submit(() -> fetch());
+        FXStatic.executor.submit(() -> {
+            for (int i = 0; i < count; i++) {
+                fetch();
+            }
+            fetchButton.setDisable(false);
+            indicateProgressEnd();
+        });
     }
     
     private void fetch() {
@@ -135,8 +164,6 @@ public class SourceBrowserController implements Initializable {
         
         lastPage = src.getPage();
         page.setText(String.valueOf(lastPage));
-        fetchButton.setDisable(false);
-        indicateProgressEnd();
     }
     
     private void indicateProgressStart() {
@@ -165,16 +192,14 @@ public class SourceBrowserController implements Initializable {
             //box.prefWidthProperty().bind(thumbSize);
             box.prefHeightProperty().bind(thumbSize);
             box.setImage(new FXImage(img));
+            box.setSelected(collectionSelector.getSelectionModel().getSelectedItem().images.entrySet().stream().anyMatch(x -> x.getValue().getEXImage().equals(box.getImage().getEXImage())));
             view.setUserData(img);
             view.setCache(true);
 
-            box.setOnMouseClicked((e) -> {
-                if (e.isControlDown() && e.getButton() == MouseButton.PRIMARY) {
-                    box.setSelected(!box.isSelected());
-                } 
-                
+            box.setOnMouseClicked((e) -> { 
                 if (e.getClickCount() == 2) {
                     collectionSelector.getSelectionModel().getSelectedItem().addImage(img);
+                    box.setSelected(true);
                 }
                 
                 if (e.getButton() == MouseButton.SECONDARY) {
@@ -183,7 +208,10 @@ public class SourceBrowserController implements Initializable {
                 e.consume();
             });
 
-            Platform.runLater(() -> flowPane.getChildren().add(box));
+            Platform.runLater(() -> { 
+                flowPane.getChildren().add(box);
+                imageList.add(box);
+            });
         }
         catch (Exception e) {
             FXStatic.handleException(e);

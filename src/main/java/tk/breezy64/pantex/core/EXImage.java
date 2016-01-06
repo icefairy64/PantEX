@@ -48,8 +48,13 @@ public abstract class EXImage implements ExtensionPoint {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof EXImage ? false :
+        return !(obj instanceof EXImage) ? false :
                 ((EXImage)obj).title.equals(this.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return title.hashCode();
     }
 
     public void setCollection(Collection collection) {

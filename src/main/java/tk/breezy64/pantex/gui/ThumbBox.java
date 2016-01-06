@@ -55,13 +55,14 @@ public class ThumbBox extends AnchorPane implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         selected = new SimpleBooleanProperty(false);
         
-        imageBox.fitHeightProperty().bind(rootPane.heightProperty());
+        imageBox.fitHeightProperty().bind(rootPane.prefHeightProperty());
         rootPane.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> {
             return imageBox.getImage() != null ?
-                    imageBox.getImage().getWidth() * (rootPane.getHeight() / imageBox.getImage().getHeight()) :
+                    imageBox.getImage().getWidth() * (rootPane.getPrefHeight()/ imageBox.getImage().getHeight()) :
                     imageBox.getFitWidth();
         }, imageBox.imageProperty(), rootPane.heightProperty()));
-        imageBox.fitWidthProperty().bind(rootPane.widthProperty());
+        rootPane.maxWidthProperty().bind(rootPane.prefWidthProperty());
+        imageBox.fitWidthProperty().bind(rootPane.prefWidthProperty());
         
         selectionMarker.visibleProperty().bind(selected);
         //selectionMarker.scaleXProperty().bind(rootPane.heightProperty().divide(100));

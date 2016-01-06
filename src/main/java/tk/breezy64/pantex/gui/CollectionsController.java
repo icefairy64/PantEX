@@ -123,10 +123,12 @@ public class CollectionsController implements Initializable {
         // Filling import/export buttons
         
         importButton.getItems().addAll(Static.pluginManager.getExtensions(Importer.class).stream()
-                .map((x) -> createImportItem(x)).collect(Collectors.toList()));
+                .map((x) -> createImportItem(x))
+                .collect(Collectors.toList()));
         
         exportButton.getItems().addAll(Static.pluginManager.getExtensions(Exporter.class).stream()
-                .map((x) -> createExportItem(x)).collect(Collectors.toList()));
+                .map((x) -> createExportItem(x))
+                .collect(Collectors.toList()));
     }
     
     private void addWhileVisible(EXImage[] imgs, int index) {
@@ -241,8 +243,7 @@ public class CollectionsController implements Initializable {
         event.consume();
         FXCollection col = collectionsList.getSelectionModel().getSelectedItem();
         TextInputDialog d = new TextInputDialog(col.title);
-        d.getDialogPane().getScene().getStylesheets().add(getClass().getResource("/src/main/resources/css/default.css").toString());
-        d.getDialogPane().getStyleClass().add("dialog-pane");
+        FXStatic.applyCss(d.getDialogPane(), "dialog-pane");
         d.setContentText("Enter new collection name:");
         d.showAndWait().ifPresent((x) -> col.title = x);
         

@@ -13,6 +13,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 
 /**
@@ -36,6 +37,10 @@ public class FXStatic {
         });
     }
     
+    public static void applyCss(Pane x, String styleClass) {
+        x.getScene().getStylesheets().add(FXStatic.class.getResource("/src/main/resources/css/default.css").toString());
+        x.getStyleClass().add(styleClass);
+    }
     
     public static void handleException(Throwable e) {
         e.printStackTrace(System.err);
