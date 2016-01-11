@@ -5,6 +5,7 @@
  */
 package tk.breezy64.pantex.gui;
 
+import tk.breezy64.pantex.core.CollectionImportRecord;
 import com.sun.javafx.collections.ObservableMapWrapper;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -26,8 +27,8 @@ public class FXCollection extends Collection {
     public FXCollection(String title) {
         super(title);
         this.images = new ObservableMapWrapper<>(new LinkedHashMap<Integer, FXImage>());
-        this.images.addListener((MapChangeListener<Integer, FXImage>)(x) ->
-                FXStatic.rebuildImageList());
+        //this.images.addListener((MapChangeListener<Integer, FXImage>)(x) ->
+        //        FXStatic.rebuildImageList());
     }
 
     @Override
@@ -66,8 +67,12 @@ public class FXCollection extends Collection {
     public static ObservableMap<Integer, FXCollection> initDictionary() {
         ObservableMap<Integer, FXCollection> res = new ObservableMapWrapper<>(new LinkedHashMap<>());
         res.addListener((MapChangeListener<Integer, FXCollection>)(x) -> { 
-                if (x.getValueRemoved() != null)    
-                    FXStatic.rebuildImageList();
+                //if (x.getValueRemoved() != null)    
+                //    FXStatic.rebuildImageList();
+            
+                if (x.wasAdded() && defaultCollection == null) {
+                    defaultCollection = x.getValueAdded();
+                }
             
                 if (x.getValueRemoved() == defaultCollection) 
                     defaultCollection = dictionary.values().iterator().next();
@@ -89,6 +94,12 @@ public class FXCollection extends Collection {
     
     public static FXCollection create(String title) {
         FXCollection col = new FXCollection(title);
+        return col;
+    }
+    
+    public static FXCollection create(String title, CollectionImportRecord ir) {
+        FXCollection col = new FXCollection(title);
+        col.importRecord = ir;
         return col;
     }
 

@@ -51,8 +51,7 @@ import tk.breezy64.pantex.core.sources.ImageSourceRequester;
  * @author icefairy64
  */
 public class MainController implements Initializable {
-    
-    private DanbooruSource danbooru = new DanbooruSource();
+
     private DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
     
     @FXML
@@ -151,12 +150,6 @@ public class MainController implements Initializable {
     private void indicateProgressEnd() {
         loadingIndicator.setVisible(false);
         imagePane.setEffect(null);
-    }
-    
-    private void fetchDanbooru(ActionEvent event) {
-        indicateProgressStart();
-        FXStatic.executor.submit(() -> onFetch(danbooru.next()));
-        event.consume();
     }
     
     private void onFetch(EXImage[] imgs) {

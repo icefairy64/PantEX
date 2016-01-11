@@ -8,6 +8,7 @@ package tk.breezy64.pantex.core.auth;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import tk.breezy64.pantex.core.Static;
 
 /**
@@ -16,7 +17,7 @@ import tk.breezy64.pantex.core.Static;
  */
 public class AuthManager {
     
-    public static AuthManager instance;
+    private static AuthManager instance;
     
     private final Map<Class<?>, Authorizer> authorizers;
     
@@ -31,6 +32,10 @@ public class AuthManager {
     
     public Authorizer<?> get(Class<?> type) {
         return authorizers.get(type);
+    }
+    
+    public List<Authorizer> getAuthorizers() {
+        return authorizers.values().stream().collect(Collectors.toList());
     }
     
     public static AuthManager getInstance() {

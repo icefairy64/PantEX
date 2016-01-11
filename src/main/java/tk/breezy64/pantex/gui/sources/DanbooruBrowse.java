@@ -14,7 +14,7 @@ import tk.breezy64.pantex.core.sources.ImageSourceRequester;
  * @author icefairy64
  */
 @Extension
-public class DanbooruSimpleRequester extends ImageSourceRequester<DanbooruSource> {
+public class DanbooruBrowse extends ImageSourceRequester<DanbooruSource> {
 
     @Override
     public String getCategory() {

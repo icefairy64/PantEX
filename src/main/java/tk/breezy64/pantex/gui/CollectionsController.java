@@ -30,7 +30,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
@@ -113,7 +112,6 @@ public class CollectionsController implements Initializable {
         imagesGrid.prefWidthProperty().bind(scrollPane.widthProperty());
         
         scrollPane.vvalueProperty().addListener((ChangeListener<Number>)(x, oV, nV) -> {
-            System.out.println(nV.toString());
             FXCollection col = collectionsList.getSelectionModel().getSelectedItem();
             if (!adding && col != null && nV.doubleValue() >= scrollPane.getVmax() - (LOAD_THRESHOLD / imagesGrid.getHeight())) {
                 addWhileVisible(col.getImagesReverse(), pos);
@@ -195,8 +193,9 @@ public class CollectionsController implements Initializable {
     private MenuItem createImportItem(Importer x) {
         MenuItem item = new MenuItem(x.getTitle());
             item.setOnAction((ev) -> {
+                Object conf = x.createImportConfiguration();
+                FXStatic.executor.submit(() -> load(x, conf));
                 indicateProgressStart();
-                FXStatic.executor.submit(() -> load(x));
                 ev.consume();
             });
             return item;
@@ -264,23 +263,17 @@ public class CollectionsController implements Initializable {
     private void indicateProgressEnd() {
         progressIndicator.setVisible(false);
     }
-
-    @FXML
-    private void importClick(ActionEvent event) {
-        event.consume();
-        indicateProgressStart();
-        FXStatic.executor.submit(() -> load(EXPackWrapper.getInstance()));
-    }
     
-    private void load(Importer imp) {
+    private void load(Importer imp, Object conf) {
         try {
             FXCollection col = FXCollection.create("");
             imp.afterImport((x) -> Platform.runLater(() -> {
+                        System.out.println(col.importRecord.toString());
                         FXCollection.dictionary.put(col.index, col);
                         indicateProgressEnd();
                     }))
                     .onImportProgress((c, t) -> Platform.runLater(() -> progressIndicator.setProgress((double)c / t)))
-                    .load(col);
+                    .load(col, conf);
         }
         catch (Exception e) {
             FXStatic.handleException(e);

@@ -17,7 +17,7 @@ import tk.breezy64.pantex.gui.MainController;
  * @author icefairy64
  */
 @Extension
-public class DanbooruSearchRequester extends ImageSourceRequester<DanbooruSource> {
+public class DanbooruSearch extends ImageSourceRequester<DanbooruSource> {
 
     @Override
     public String getCategory() {

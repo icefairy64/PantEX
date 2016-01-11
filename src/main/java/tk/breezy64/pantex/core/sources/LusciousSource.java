@@ -26,7 +26,7 @@ public class LusciousSource extends ImageSource {
     
     private final String url;
     
-    private static final Pattern thumbPattern = Pattern.compile("a href=\"//luscious\\.net/c/.+?img src=\"(.+?)\"", Pattern.DOTALL);
+    private static final Pattern thumbPattern = Pattern.compile("a href=\"/c/.+?img src=\"(.+?)\"", Pattern.DOTALL);
     
     public LusciousSource(String category) {
         url = simpleURL.replaceFirst("%s", category);
@@ -47,8 +47,7 @@ public class LusciousSource extends ImageSource {
             
             EXImage img = new RemoteImage(iurl);
             imgs.add(img);
-            img.thumb = new RemoteImage(furl);
-            Cache.getInstance().find(img.thumb).ifPresent((x) -> img.thumb = x);
+            img.thumb = Cache.getInstance().tryFind(new RemoteImage(furl));
         }
         
         cache = imgs.toArray(new EXImage[0]);

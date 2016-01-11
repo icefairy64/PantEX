@@ -5,6 +5,7 @@
  */
 package tk.breezy64.pantex.core;
 
+import java.util.HashMap;
 import java.util.Map;
 import ro.fortsoft.pf4j.ExtensionPoint;
 
@@ -14,11 +15,24 @@ import ro.fortsoft.pf4j.ExtensionPoint;
  */
 public abstract class ConfigSection implements ExtensionPoint {
 
+    protected int priority;
+    
     public ConfigSection() {
     }
     
     public abstract String getTitle();
-    public abstract void load(Map<String, Object> root);
-    public abstract Map<String, Object> save();
+    
+    public void load(Map<String, Object> root) {
+        priority = 0;
+        if (root.containsKey("priority")) {
+            priority = (Integer)root.get("priority");
+        }
+    }
+    
+    public Map<String, Object> save() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("priority", (Integer)priority);
+        return map;
+    }
     
 }

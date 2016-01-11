@@ -54,8 +54,7 @@ public class RedditSource extends ImageSource {
             url = url.replace("`", "");
             EXImage img = new RemoteImage(url);
             res.add(img);
-            img.thumb = new RemoteImage(thumb == null ? url : thumb);
-            Cache.getInstance().find(img.thumb).ifPresent((x) -> img.thumb = x);
+            img.thumb = Cache.getInstance().tryFind(new RemoteImage(thumb == null ? url : thumb));
             
             return res;
         }

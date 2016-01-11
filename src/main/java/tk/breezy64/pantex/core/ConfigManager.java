@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -33,9 +34,28 @@ public class ConfigManager {
         r.setLenient(true);
         JsonObject json = new JsonParser().parse(r).getAsJsonObject();
         List<ConfigSection> x = Static.pluginManager.getExtensions(ConfigSection.class);
+        
+        Map<Integer, List<ConfigSection>> pr = new HashMap<>();
+        Map<ConfigSection, Map<String, Object>> csMap = new HashMap<>();
+        
         for (ConfigSection cs : x) {
             if (json.has(cs.getTitle())) {
-                cs.load(jsonObjectToMap(json.getAsJsonObject(cs.getTitle())));
+                Map<String, Object> map = jsonObjectToMap(json.getAsJsonObject(cs.getTitle()));
+                int priority = map.containsKey("priority") ? (Integer)map.get("priority") : 0;
+                
+                List<ConfigSection> l = pr.get(priority);
+                if (l == null) {
+                    l = new ArrayList<>();
+                    pr.put(priority, l);
+                }
+                l.add(cs);
+                csMap.put(cs, map);
+            }
+        }
+        
+        for (List<ConfigSection> e : pr.entrySet().stream().sorted((a, b) -> a.getKey().compareTo(b.getKey())).map(z -> z.getValue()).collect(Collectors.toList())) {
+            for (ConfigSection c : e) {
+                c.load(csMap.get(c));
             }
         }
     }

@@ -40,6 +40,17 @@ public class Cache {
                 : Optional.empty();
     }
     
+    public EXImage tryFind(EXImage proto) throws IOException {
+        Optional<EXImage> img = find(proto);
+        if (img.isPresent()) {
+            return img.get();
+        }
+        else {
+            store(proto);
+            return proto;
+        }
+    }
+    
     public void store(EXImage img) throws IOException {
         if (cacheMap.size() >= size) {
             Long id = cacheMap.keySet().iterator().next();

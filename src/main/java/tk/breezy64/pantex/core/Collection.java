@@ -12,6 +12,7 @@ package tk.breezy64.pantex.core;
 public abstract class Collection {
     
     public String title;
+    public CollectionImportRecord importRecord;
     public final int index;
 
     public Collection(String title) {

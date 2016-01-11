@@ -13,6 +13,7 @@ import javafx.application.Platform;
 import javafx.stage.FileChooser;
 import ro.fortsoft.pf4j.Extension;
 import tk.breezy64.pantex.core.Collection;
+import tk.breezy64.pantex.core.CollectionImportRecord;
 import tk.breezy64.pantex.core.EXPack;
 import tk.breezy64.pantex.core.ExportException;
 import tk.breezy64.pantex.core.Exporter;
@@ -37,24 +38,45 @@ public class EXPackWrapper implements Importer, Exporter {
     }
 
     @Override
-    public void load(Collection col) throws IOException, ImportException {
+    public Object createImportConfiguration() {
         FileChooser ch = new FileChooser();
-        Platform.runLater(() -> {
-            File f = ch.showOpenDialog(null);
-            FXStatic.executor.submit(() -> {
-                if (f != null) {
-                    try {
-                        EXPack.getInstance().load(f, col, importProgressHandler);
-                        if (importHandler != null) {
-                            importHandler.accept(col);
-                        }
-                    }
-                    catch (Exception e) {
-                        FXStatic.handleException(e);
-                    }
+        File f = ch.showOpenDialog(null);
+        return new EXPackImportConfiguration(f);
+    }
+
+    @Override
+    public Object createMinimalImportConfiguration() {
+        return null;
+    }
+
+    @Override
+    public void load(Collection col, Object conf) throws IOException, ImportException {
+        EXPackImportConfiguration c = (EXPackImportConfiguration)conf;
+        
+        if (c.file != null) {
+            try {
+                EXPack.getInstance().load(c.file, col, importProgressHandler);
+                if (importHandler != null) {
+                    importHandler.accept(col);
                 }
-            });
-        });
+            } catch (Exception e) {
+                FXStatic.handleException(e);
+            }
+        }
+    }
+
+    @Override
+    public void load(Collection col, CollectionImportRecord ir, Object conf) throws IOException, ImportException {
+        File f = new File(ir.collectionDescriptor);
+        try {
+            EXPack.getInstance().load(f, col, importProgressHandler);
+            if (importHandler != null) {
+                importHandler.accept(col);
+            }
+
+        } catch (Exception e) {
+            FXStatic.handleException(e);
+        }
     }
 
     @Override

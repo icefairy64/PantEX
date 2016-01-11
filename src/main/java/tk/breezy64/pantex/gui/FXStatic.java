@@ -15,6 +15,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -22,13 +24,15 @@ import javafx.stage.FileChooser;
  */
 public class FXStatic {
     
+    private static final Logger logger = LoggerFactory.getLogger(FXStatic.class);
+    
     public static FileChooser.ExtensionFilter imageExtFilter = new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif");
     public static ObservableList<FXImage> images = new ObservableListWrapper<>(new LinkedList<>());
     public static ExecutorService executor = Executors.newCachedThreadPool();
     public static ObjectProperty<FXImage> currentImage = new SimpleObjectProperty<>();
     
     public static void rebuildImageList() {
-        Platform.runLater(() ->{
+        Platform.runLater(() -> {
             images.clear();
 
             for (FXCollection col : FXCollection.dictionary.values()) {
@@ -43,7 +47,7 @@ public class FXStatic {
     }
     
     public static void handleException(Throwable e) {
-        e.printStackTrace(System.err);
+        logger.error("Error", e);
         throw new RuntimeException(e);
     }
     

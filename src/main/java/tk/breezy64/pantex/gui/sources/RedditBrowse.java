@@ -17,7 +17,7 @@ import tk.breezy64.pantex.gui.MainController;
  * @author icefairy64
  */
 @Extension
-public class RedditSimpleRequester extends ImageSourceRequester<RedditSource>{
+public class RedditBrowse extends ImageSourceRequester<RedditSource>{
 
     @Override
     public String getCategory() {

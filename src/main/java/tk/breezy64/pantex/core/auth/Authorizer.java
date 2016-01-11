@@ -20,6 +20,10 @@ public abstract class Authorizer<T extends Token> implements ExtensionPoint {
         return token != null ? Optional.of(token) : Optional.empty();
     }
     
+    public boolean isAuthorized() {
+        return token != null;
+    }
+    
     public T getOrCreateToken() throws AuthException {
         return token != null ? token : auth();
     }

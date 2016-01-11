@@ -27,8 +27,7 @@ public class PantEX extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-        
-        FXCollection.createAndAdd("Temp");
+
         Static.pluginManager.loadPlugins();
         Static.pluginManager.startPlugins();
         ConfigManager.load(new File(configFile));

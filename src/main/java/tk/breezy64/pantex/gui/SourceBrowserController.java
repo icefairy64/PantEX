@@ -11,11 +11,13 @@ import tk.breezy64.pantex.core.sources.ImageSource;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -105,21 +107,27 @@ public class SourceBrowserController implements Initializable {
                 d.setHeaderText("Fetch");
                 d.setContentText("Pages to fetch:");
                 FXStatic.applyCss(d.getDialogPane(), "dialog-pane");
-                d.showAndWait().ifPresent((s) -> {
+                /*d.showAndWait().ifPresent((s) -> {
                     int x = Integer.parseInt(s);
                     fetch(x);
-                });
+                });*/
+                Optional<String> o = d.showAndWait();
+                if (o.isPresent()) {
+                    int x = Integer.parseInt(o.get());
+                    fetch(x);
+                }
             }
         });
     }    
 
     @FXML
     private void fetchClick(ActionEvent event) {
+        event.consume();
         fetch(1);
     }
     
     private void fetch(int count) {
-         if (src == null) {
+        if (src == null) {
             src = (ImageSource)flowPane.getScene().getUserData();
             src.onException((x) -> FXStatic.handleException(x));
         }
@@ -138,13 +146,50 @@ public class SourceBrowserController implements Initializable {
         
         indicateProgressStart();
         fetchButton.setDisable(true);
-        FXStatic.executor.submit(() -> {
-            for (int i = 0; i < count; i++) {
-                fetch();
+        
+        Task<Void> task = new Task<Void>() {
+
+            @Override
+            protected Void call() throws Exception {
+                for (int i = 0; i < count; i++) {
+                    if (isCancelled()) {
+                        break;
+                    }
+                    fetch();
+                }
+                return null;
             }
-            fetchButton.setDisable(false);
-            indicateProgressEnd();
-        });
+
+            @Override
+            protected void scheduled() {
+                updateTitle(String.format("Fetching %d pages", count));
+                super.scheduled();
+            }
+
+            @Override
+            protected void done() {
+                super.done();
+                fetchButton.setDisable(false);
+                indicateProgressEnd();
+            }
+
+            @Override
+            protected void failed() {
+                super.failed();
+                fetchButton.setDisable(false);
+                indicateProgressEnd();
+            }
+
+            @Override
+            protected void cancelled() {
+                super.cancelled();
+                fetchButton.setDisable(false);
+                indicateProgressEnd();
+            }
+            
+        };
+        
+        FXTask.run(task);
     }
     
     private void fetch() {

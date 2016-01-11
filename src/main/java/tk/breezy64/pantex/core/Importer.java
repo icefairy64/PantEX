@@ -19,7 +19,23 @@ public interface Importer extends ExtensionPoint {
     
     public String getTitle();
     public Importer onImportProgress(BiConsumer<Integer, Integer> handler);
-    public void load(Collection col) throws IOException, ImportException;
+    
+    /**
+     * Creates concrete import configuration based on user input
+     * Note: this method should be called from UI thread
+     * @return Import configuration
+     */
+    public Object createImportConfiguration();
+    
+    /**
+     * Creates minimal necessary import configuration based on user input
+     * Note: this method should be called from UI thread
+     * @return Import configuration
+     */
+    public Object createMinimalImportConfiguration();
+    
+    public void load(Collection col, Object conf) throws IOException, ImportException;
+    public void load(Collection col, CollectionImportRecord ir, Object conf) throws IOException, ImportException;
     public Importer afterImport(Consumer<Collection> handler);
     
 }

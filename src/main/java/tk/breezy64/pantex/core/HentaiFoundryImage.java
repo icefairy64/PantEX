@@ -26,11 +26,18 @@ public class HentaiFoundryImage extends EXImage implements Loadable {
     public HentaiFoundryImage(String path, String thumbUrl) {
         super(null, null, null);
         this.path = path;
-        this.thumb = new RemoteImage(thumbUrl);
+        
+        try {
+            this.thumb = Cache.getInstance().tryFind(new RemoteImage(thumbUrl));
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        
         Matcher m = pathPattern.matcher(path);
         m.find();
         this.title = m.group(3);
-        Cache.getInstance().find(thumb).ifPresent((x) -> thumb = x);
+        
     }
 
     @Override

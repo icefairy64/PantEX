@@ -23,27 +23,28 @@ import tk.breezy64.pantex.core.Tag;
  *
  * @author icefairy64
  */
-public class DanbooruSource extends ImageSource {
+public abstract class DanbooruCompatibleSource extends ImageSource {
     
-    private static final String root = "http://danbooru.donmai.us";
-    private static final String simpleURL = "http://danbooru.donmai.us/posts?page=%d";
-    private static final String searchURL = "http://danbooru.donmai.us/posts?tags=%s&page=%d";
+    protected String simpleURL = getRoot() + "/post.json?page=%d";
+    protected String searchURL = getRoot() + "/post.json?tags=%s&page=%d";
     
-    private static final Pattern imgPattern = Pattern.compile("data-file-url=\"(.*)\"");
-    private static final Pattern thumbPattern = Pattern.compile("data-preview-file-url=\"(.*)\"");
-    private static final Pattern tagsPattern = Pattern.compile("data-tags=\"(.*)\"");
+    protected static final Pattern imgPattern = Pattern.compile("file_url\":\"(.*?)\"");
+    protected static final Pattern thumbPattern = Pattern.compile("preview_url\":\"(.*?)\"");
+    protected static final Pattern tagsPattern = Pattern.compile("tags\":\"(.*?)\"");
     
     private final String url;
     
-    public DanbooruSource() {
+    public DanbooruCompatibleSource() {
         super();
         url = simpleURL;
     }
     
-    public DanbooruSource(String query) {
+    public DanbooruCompatibleSource(String query) {
         super();
         url = searchURL.replace("%s", URLEncoder.encode(query));
     }
+    
+    protected abstract String getRoot();
     
     @Override
     protected void load(int page) throws IOException {
@@ -59,20 +60,15 @@ public class DanbooruSource extends ImageSource {
             t.find();
             tg.find();
             
-            String furl = root + m.group(1);
+            String furl = m.group(1);
             String[] tags = tg.group(1).split(" ");
             
             EXImage img = new RemoteImage(furl, null, Arrays.stream(tags).map((x) -> Tag.getOrCreate(x)).collect(Collectors.toList()));
             imgs.add(img);
-            img.thumb = Cache.getInstance().tryFind(new RemoteImage(root + t.group(1)));
+            img.thumb = Cache.getInstance().tryFind(new RemoteImage(t.group(1)));
         }
         
         cache = imgs.toArray(new EXImage[0]);
-    }
-
-    @Override
-    public String getWindowTitle() {
-        return "Danbooru browser";
     }
     
 }

@@ -10,12 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author icefairy64
  */
 public class ImgurHelper {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ImgurHelper.class);
     
     private static final Pattern[] imagePatterns = new Pattern[] {
         Pattern.compile("data-src=\"(.+?)\""),
@@ -55,13 +59,12 @@ public class ImgurHelper {
             String thumbUrl = "http://i.imgur.com/" + hash.replace(ext, "m" + ext);
 
             EXImage img = new RemoteImage(imgUrl);
-            img.thumb = new RemoteImage(thumbUrl);
-            Cache.getInstance().find(img.thumb).ifPresent((x) -> img.thumb = x);
+            img.thumb = Cache.getInstance().tryFind(new RemoteImage(thumbUrl));
             list.add(img);
         }
         
         if (list.isEmpty()) {
-            System.out.println("Warning: Imgur helper probably failed to parse page " + url);
+            logger.warn("Warning: Imgur helper probably failed to parse page " + url);
         }
         
         return list;
