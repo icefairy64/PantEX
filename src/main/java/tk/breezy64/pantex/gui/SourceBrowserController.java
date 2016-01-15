@@ -5,7 +5,6 @@
  */
 package tk.breezy64.pantex.gui;
 
-import java.io.IOException;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.sources.ImageSource;
 import java.net.URL;
@@ -21,7 +20,6 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ProgressIndicator;
@@ -30,7 +28,6 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.effect.GaussianBlur;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
@@ -49,6 +46,7 @@ public class SourceBrowserController implements Initializable {
     private IntegerProperty thumbSize;
     private int lastPage;
     private List<ThumbBox> imageList;
+    private ThumbContainerManager containerManager;
     
     @FXML
     private FlowPane flowPane;
@@ -79,6 +77,7 @@ public class SourceBrowserController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         imageList = new ArrayList<>();
+        containerManager = new ThumbContainerManager(flowPane);
         
         collectionSelector.getSelectionModel().selectedItemProperty().addListener((ChangeListener<FXCollection>)(v, oV, nV) -> {
             imageList.stream()
@@ -107,10 +106,6 @@ public class SourceBrowserController implements Initializable {
                 d.setHeaderText("Fetch");
                 d.setContentText("Pages to fetch:");
                 FXStatic.applyCss(d.getDialogPane(), "dialog-pane");
-                /*d.showAndWait().ifPresent((s) -> {
-                    int x = Integer.parseInt(s);
-                    fetch(x);
-                });*/
                 Optional<String> o = d.showAndWait();
                 if (o.isPresent()) {
                     int x = Integer.parseInt(o.get());
@@ -213,13 +208,11 @@ public class SourceBrowserController implements Initializable {
     
     private void indicateProgressStart() {
         progressIndicator.setVisible(true);
-        //shadeRect.setVisible(true);
         flowPane.setEffect(new GaussianBlur(25));
     }
     
     private void indicateProgressEnd() {
         progressIndicator.setVisible(false);
-        //shadeRect.setVisible(false);
         flowPane.setEffect(null);
     }
 
@@ -243,18 +236,26 @@ public class SourceBrowserController implements Initializable {
 
             box.setOnMouseClicked((e) -> { 
                 if (e.getClickCount() == 2) {
-                    collectionSelector.getSelectionModel().getSelectedItem().addImage(img);
-                    box.setSelected(true);
+                    if (!box.isSelected()) {
+                        collectionSelector.getSelectionModel().getSelectedItem().addImage(img);
+                        box.setSelected(true);
+                    }
+                    else {
+                        collectionSelector.getSelectionModel().getSelectedItem().removeImage(img);
+                        box.setSelected(false);
+                    }
                 }
                 
                 if (e.getButton() == MouseButton.SECONDARY) {
                     FXStatic.currentImage.set(box.getImage());
                 }
+                
                 e.consume();
             });
 
             Platform.runLater(() -> { 
-                flowPane.getChildren().add(box);
+                //flowPane.getChildren().add(box);
+                containerManager.add(box);
                 imageList.add(box);
             });
         }

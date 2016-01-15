@@ -8,7 +8,6 @@ package tk.breezy64.pantex.gui;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -17,8 +16,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Polygon;
@@ -48,9 +45,6 @@ public class ThumbBox extends AnchorPane implements Initializable {
         super(children);
     }
     
-    /**
-     * Initializes the controller class.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         selected = new SimpleBooleanProperty(false);
@@ -58,17 +52,13 @@ public class ThumbBox extends AnchorPane implements Initializable {
         imageBox.fitHeightProperty().bind(rootPane.prefHeightProperty());
         rootPane.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> {
             return imageBox.getImage() != null ?
-                    imageBox.getImage().getWidth() * (rootPane.getPrefHeight()/ imageBox.getImage().getHeight()) :
+                    imageBox.getImage().getWidth() * (rootPane.getPrefHeight() / imageBox.getImage().getHeight()) :
                     imageBox.getFitWidth();
         }, imageBox.imageProperty(), rootPane.heightProperty()));
         rootPane.maxWidthProperty().bind(rootPane.prefWidthProperty());
         imageBox.fitWidthProperty().bind(rootPane.prefWidthProperty());
         
         selectionMarker.visibleProperty().bind(selected);
-        //selectionMarker.scaleXProperty().bind(rootPane.heightProperty().divide(100));
-        //selectionMarker.scaleYProperty().bind(selectionMarker.scaleXProperty());
-        //selectionMarker.translateXProperty().bind(rootPane.heightProperty().subtract(100).divide(100).multiply(30).negate());
-        //selectionMarker.translateYProperty().bind(selectionMarker.translateXProperty());
     }
     
     public void setImage(FXImage img) throws IOException {
@@ -107,7 +97,7 @@ public class ThumbBox extends AnchorPane implements Initializable {
             ldr.load();
         }
         catch (IOException e) {
-            throw new RuntimeException(e);
+            FXStatic.handleException(e);
         }
         return tmp;
     }

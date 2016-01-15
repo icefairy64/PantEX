@@ -134,7 +134,7 @@ and open the template in the editor.
 .slider .thumb,
 .combo-box .arrow-button {
     -fx-background-color: linear-gradient(to bottom, #545463, #4a4a4d);
-    -fx-effect: dropshadow(gaussian, #718cff, 2, 0.05, 0, 0); //#718cff rgba(113, 140, 255, 64)
+    -fx-effect: dropshadow(gaussian, #718cff, 2, 0.05, 0, 0);
     -fx-effect: innershadow(gaussian, #718cff, 2, 0.0001, 0, 0);
 }
 

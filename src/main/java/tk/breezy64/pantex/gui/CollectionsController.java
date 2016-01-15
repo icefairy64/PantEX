@@ -35,6 +35,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.Exporter;
 import tk.breezy64.pantex.core.Importer;
@@ -47,9 +49,11 @@ import tk.breezy64.pantex.core.Static;
  */
 public class CollectionsController implements Initializable {
     
+    private static final Logger logger = LoggerFactory.getLogger(CollectionsController.class);
     private static final int LOAD_THRESHOLD = 300;
     private static final int LOAD_SIZE = 12;
     
+    private ThumbContainerManager containerManager;
     private boolean adding = false;
     private int pos = 0;
     
@@ -76,9 +80,9 @@ public class CollectionsController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         selection = new ArrayList<>();
+        containerManager = new ThumbContainerManager(imagesGrid);
         
         collectionsList.getItems().addAll(FXCollection.dictionary.values());
-        collectionsList.getSelectionModel().select(0);
         
         FXCollection.dictionary.addListener((MapChangeListener<Integer, FXCollection>)(x) -> {
             Platform.runLater(() -> {
@@ -127,6 +131,10 @@ public class CollectionsController implements Initializable {
         exportButton.getItems().addAll(Static.pluginManager.getExtensions(Exporter.class).stream()
                 .map((x) -> createExportItem(x))
                 .collect(Collectors.toList()));
+        
+        // Setting collection
+        
+        collectionsList.getSelectionModel().select(0);
     }
     
     private void addWhileVisible(EXImage[] imgs, int index) {
@@ -183,7 +191,7 @@ public class CollectionsController implements Initializable {
                 e.consume();
             });
 
-            Platform.runLater(() -> imagesGrid.getChildren().add(box));
+            Platform.runLater(() -> containerManager.add(box));
         }
         catch (IOException e) {
             FXStatic.handleException(e);
@@ -268,8 +276,8 @@ public class CollectionsController implements Initializable {
         try {
             FXCollection col = FXCollection.create("");
             imp.afterImport((x) -> Platform.runLater(() -> {
-                        System.out.println(col.importRecord.toString());
                         FXCollection.dictionary.put(col.index, col);
+                        logger.info(x.importRecord.toString().replace("\n", "\\n"));
                         indicateProgressEnd();
                     }))
                     .onImportProgress((c, t) -> Platform.runLater(() -> progressIndicator.setProgress((double)c / t)))
@@ -302,6 +310,7 @@ public class CollectionsController implements Initializable {
     private void removeImagesClick(ActionEvent event) {
         for (ThumbBox img : selection) {
             img.getImage().getEXImage().collection.removeImage(img.getImage().getEXImage());
+            imagesGrid.getChildren().remove(imagesGrid.getChildren().stream().filter(z -> ((ThumbBox)z).getImage().equals(img.getImage())).findAny().get());
         }
 
         event.consume();
@@ -316,7 +325,10 @@ public class CollectionsController implements Initializable {
         Optional<FXCollection> col = dialog.showAndWait();
         col.ifPresent((x) -> {
             List<FXImage> l = new ArrayList<>(selection.stream().map(z -> z.getImage()).collect(Collectors.toList()));
-            l.forEach((img) -> img.getEXImage().collection.moveImage(img.getEXImage(), x));
+            l.forEach((img) -> {
+                img.getEXImage().collection.moveImage(img.getEXImage(), x);
+                imagesGrid.getChildren().remove(imagesGrid.getChildren().stream().filter(z -> ((ThumbBox)z).getImage().equals(img)).findAny().get());
+            });
         });
         
         event.consume();

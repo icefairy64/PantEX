@@ -48,7 +48,7 @@ public class FXStatic {
     
     public static void handleException(Throwable e) {
         logger.error("Error", e);
-        throw new RuntimeException(e);
+        //throw new RuntimeException(e);
     }
     
 }
