@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Optional;
 import tk.breezy64.pantex.core.auth.YandexToken;
+import tk.breezy64.pantex.gui.FXStatic;
 import tk.breezy64.pantex.plugin.YandexDiskPlugin;
 
 /**
@@ -38,8 +39,8 @@ public class YandexImage extends EXImage {
         try {
             inner = Optional.of(new RemoteImage(YandexDiskPlugin.YandexDiskLoader.getFileUrl(path, token), collection, tags));
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+        catch (Exception e) {
+            FXStatic.handleException(e);
         }
     }
     

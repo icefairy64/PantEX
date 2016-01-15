@@ -39,6 +39,7 @@ import ro.fortsoft.pf4j.Extension;
 import ro.fortsoft.pf4j.Plugin;
 import ro.fortsoft.pf4j.PluginWrapper;
 import tk.breezy64.pantex.core.Collection;
+import tk.breezy64.pantex.core.CollectionImportRecord;
 import tk.breezy64.pantex.core.ConfigSection;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.ExportException;
@@ -48,6 +49,7 @@ import tk.breezy64.pantex.core.Importer;
 import tk.breezy64.pantex.core.JSONPack;
 import tk.breezy64.pantex.core.Static;
 import tk.breezy64.pantex.core.Util;
+import tk.breezy64.pantex.core.YandexDiskImportConfiguration;
 import tk.breezy64.pantex.core.YandexImage;
 import tk.breezy64.pantex.core.auth.AuthException;
 import tk.breezy64.pantex.core.auth.Authorizer;
@@ -105,60 +107,72 @@ public class YandexDiskPlugin extends Plugin {
         private static InputStream getFileStream(String path, YandexToken token) throws IOException {
             return Util.fetchHttpStream(getFileUrl(path, token), new String[] { "Authorization", "OAuth " + token.getToken() });
         }
+
+        @Override
+        public Object createMinimalImportConfiguration() {
+            YandexAuthorizer auth = getAuthorizer();
+            try {
+                YandexToken token = auth.getOrCreateToken();
+                RestClient client = new RestClient(new Credentials(token.getUid(), token.getToken()));
+                return new YandexDiskImportConfiguration(client, token);
+            } 
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public Object createImportConfiguration() {
+            YandexDiskImportConfiguration conf = (YandexDiskImportConfiguration)createMinimalImportConfiguration();
+            
+            try {
+                // Getting list of directories
+                Resource res = conf.client.getResources(new ResourcesArgs.Builder().setLimit(collectionLimit).setPath("app:/").build());
+                List<String> dirs = res.getResourceList().getItems()
+                        .stream()
+                        .filter((x) -> x.isDir())
+                        .map((x) -> x.getName())
+                        .collect(Collectors.toList());
+
+                // Choosing directory
+                ChoiceDialog<String> dialog = new ChoiceDialog<>(dirs.get(0), dirs);
+                dialog.getDialogPane().getStylesheets().add(MainController.class.getResource("/src/main/resources/css/default.css").toString());
+                dialog.getDialogPane().getStyleClass().add("dialog");
+                Optional<String> r = dialog.showAndWait();
+                conf.path = r.orElse("");
+            }
+            catch (Exception e) {
+                FXStatic.handleException(e);
+            }
+            
+            return conf;
+        }
         
         @Override
-        public void load(Collection col) throws IOException, ImportException {
-            Platform.runLater(() -> {
-                YandexAuthorizer auth = getAuthorizer();
-                try {
-                    YandexToken token = auth.getOrCreateToken();
-                    if (token != null) {
-                        RestClient client = new RestClient(new Credentials(token.getUid(), token.getToken()));
+        public void load(Collection col, Object conf) throws IOException, ImportException {
+            YandexDiskImportConfiguration c = (YandexDiskImportConfiguration)conf;
+            load(col, new CollectionImportRecord(getClass().getName(), c.path), conf);
+        }
 
-                        // Getting list of directories
-                        Resource res = client.getResources(new ResourcesArgs.Builder().setLimit(collectionLimit).setPath("app:/").build());
-                        List<String> dirs = res.getResourceList().getItems()
-                                .stream()
-                                .filter((x) -> x.isDir())
-                                .map((x) -> x.getName())
-                                .collect(Collectors.toList());
-
-                        // Choosing directory
-                        ChoiceDialog<String> dialog = new ChoiceDialog<>(dirs.get(0), dirs);
-                        dialog.getDialogPane().getStylesheets().add(MainController.class.getResource("/src/main/resources/css/default.css").toString());
-                        dialog.getDialogPane().getStyleClass().add("dialog");
-                        Optional<String> r = dialog.showAndWait();
-                        
-                        FXStatic.executor.submit(() -> {
-                            try {
-                                // Loading
-                                if (r.isPresent()) {
-                                    col.title = r.get();
-                                    String rpath = URLEncoder.encode(r.get());
-                                    String path = "app:/" + rpath + "/collection.json";
-                                    JSONPack.load(col, new InputStreamReader(getFileStream(path, token)),
-                                            (title) -> {
-                                                EXImage img = new YandexImage("app:/" + rpath + "/" + title, token, col, title, null, client);
-                                                img.title = title;
-                                                img.imported = true;
-                                                return img;
-                                            }, importProgressHandler.orElse(null));
-                                } else {
-                                    throw new ExportException("Failed to request a collection");
-                                }
-                            } catch (Exception e) {
-                                FXStatic.handleException(e);
-                            }
-                            importHandler.ifPresent((x) -> x.accept(col));
-                        });
-                    } else {
-                        throw new ExportException("Failed to request a token");
-                    }
-                }
-                catch (Exception e) {
-                    FXStatic.handleException(e);
-                }
-            });
+        @Override
+        public void load(Collection col, CollectionImportRecord ir, Object conf) throws IOException, ImportException {
+            YandexDiskImportConfiguration c = (YandexDiskImportConfiguration) conf;
+            if (!ir.collectionDescriptor.isEmpty()) {
+                ir.title = ir.collectionDescriptor;
+                col.title = ir.collectionDescriptor;
+                col.importRecord = ir;
+                String rpath = URLEncoder.encode(ir.collectionDescriptor);
+                String path = "app:/" + rpath + "/collection.json";
+                JSONPack.load(col, new InputStreamReader(getFileStream(path, c.token)),
+                        (title) -> {
+                            EXImage img = new YandexImage("app:/" + rpath + "/" + title, c.token, col, title, null, c.client);
+                            img.title = title;
+                            img.imported = true;
+                            return img;
+                        }, importProgressHandler.orElse(null));
+                
+                importHandler.ifPresent(x -> x.accept(col));
+            }
         }
         
         private static List<Resource> getResources(RestClient client, String path) throws IOException, ServerIOException {
@@ -273,7 +287,7 @@ public class YandexDiskPlugin extends Plugin {
 
         @Override
         public String getTitle() {
-            return "Yandex";
+            return "Yandex.Disk";
         }
 
         @Override
