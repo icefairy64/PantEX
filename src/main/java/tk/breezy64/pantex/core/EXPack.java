@@ -45,7 +45,7 @@ public class EXPack {
         }
         
         // Reading title
-        String title = Util.readStr(f, separator);
+        String title = Util.readStr(f, SEPARATOR);
         res.title = title;
         
         // Reading tags
@@ -53,7 +53,7 @@ public class EXPack {
         Tag[] tags = new Tag[tagCount];
         
         for (int i = 0; i < tagCount; i++) {
-            tags[i] = Tag.create(Util.readStr(f, separator));
+            tags[i] = Tag.create(Util.readStr(f, SEPARATOR));
         }
         
         // Reading images
@@ -80,7 +80,7 @@ public class EXPack {
             }
             
             // Title
-            imgTitles[i] = Util.readStr(f, separator);
+            imgTitles[i] = Util.readStr(f, SEPARATOR);
             
             if (progressHandler != null) {
                 progressHandler.accept(i + 1, imgCount);
@@ -109,8 +109,8 @@ public class EXPack {
         FileOutputStream out = new FileOutputStream(file);
         FileChannel ch = out.getChannel();
         
-        out.write(signature);
-        Util.writeStr(out, col.title, separator);
+        out.write(SIGNATURE);
+        Util.writeStr(out, col.title, SEPARATOR);
         
         java.util.Collection<EXImage> imgs = Arrays.stream(col.getImages()).collect(Collectors.toList());
         List<Tag> tags = Tag.idMap.values().stream().filter((t) -> imgs.stream().anyMatch((i) -> i.tags.contains(t))).collect(Collectors.toList());
@@ -121,7 +121,7 @@ public class EXPack {
         
         Util.writeInt(ch, tags.size());
         for (Tag tag : tags) {
-            Util.writeStr(out, tag.title, separator);
+            Util.writeStr(out, tag.title, SEPARATOR);
         }
         
         Util.writeInt(ch, imgs.size());
@@ -138,7 +138,7 @@ public class EXPack {
                 Util.writeInt(ch, mtags.get(tag));
             }
             
-            Util.writeStr(out, img.title, separator);
+            Util.writeStr(out, img.title, SEPARATOR);
             if (progressHandler != null) {
                 progressHandler.accept(++i, imgs.size());
             }
@@ -159,25 +159,25 @@ public class EXPack {
     
     // Static
     
-    private static final byte[] signature = { 0x50, 0x41, 0x4e, 0x54, 0x53, 0x55, 0x45, 0x58 };
-    private static final int separator = 0x00;
-    private static EXPack instance = new EXPack();
+    private static final byte[] SIGNATURE = { 0x50, 0x41, 0x4e, 0x54, 0x53, 0x55, 0x45, 0x58 };
+    private static final int SEPARATOR = 0x00;
+    private final static EXPack INSTANCE = new EXPack();
     
     public static void loadCollection(File file, Collection res) throws IOException, ImportException {
-        instance.load(file, res, null);
+        INSTANCE.load(file, res, null);
     }
     
     public static EXPack getInstance() {
-        return instance;
+        return INSTANCE;
     }
     
     public static void writeCollection(Collection res, File file) throws IOException {
-        instance.write(res, file, null);
+        INSTANCE.write(res, file, null);
     }
     
     private static boolean checkSignature(InputStream s) throws IOException {
-        for (int i = 0; i < signature.length; i++) {
-            if (s.read() != signature[i]) {
+        for (int i = 0; i < SIGNATURE.length; i++) {
+            if (s.read() != SIGNATURE[i]) {
                 return false;
             }
         }

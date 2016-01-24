@@ -12,7 +12,7 @@ import javafx.stage.Stage;
  *
  * @author icefairy64
  */
-public final class Util {
+public final class FXUtil {
     
     public static void showScene(Scene scene, String title) {
         Stage st = new Stage();

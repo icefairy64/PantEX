@@ -23,22 +23,28 @@ import tk.breezy64.pantex.core.Tag;
  *
  * @author icefairy64
  */
-public abstract class DanbooruCompatibleSource extends ImageSource {
+public abstract class DAPICompatibleSource extends ImageSource {
     
-    protected Pattern imgPattern = Pattern.compile("file_url\":\"(.*?)\"");
-    protected Pattern thumbPattern = Pattern.compile("preview_url\":\"(.*?)\"");
-    protected Pattern tagsPattern = Pattern.compile("tags\":\"(.*?)\"");
+    protected String simpleURL = getRoot() + "/index.php?page=dapi&s=post&q=index&pid=%d";
+    protected String searchURL = getRoot() + "/index.php?page=dapi&s=post&q=index&tags=%s&pid=%d";
     
-    protected String url;
+    protected static final Pattern imgPattern = Pattern.compile("file_url=\"(.*?)\"");
+    protected static final Pattern thumbPattern = Pattern.compile("preview_url=\"(.*?)\"");
+    protected static final Pattern tagsPattern = Pattern.compile("tags=\"(.*?)\"");
     
-    public DanbooruCompatibleSource() {
+    private final String url;
+    private final String proto;
+    
+    public DAPICompatibleSource(boolean appendProto) {
         super();
-        url = getRoot() + "/post.json?page=%d";
+        url = simpleURL;
+        proto = appendProto ? getRoot().substring(0, getRoot().indexOf(':') + 1) : "";
     }
     
-    public DanbooruCompatibleSource(String query) {
+    public DAPICompatibleSource(boolean appendProto, String query) {
         super();
-        url = (getRoot() + "/post.json?tags=%s&page=%d").replace("%s", URLEncoder.encode(query));
+        url = searchURL.replace("%s", URLEncoder.encode(query));
+        proto = appendProto ? getRoot().substring(0, getRoot().indexOf(':') + 1) : "";
     }
     
     protected abstract String getRoot();
@@ -60,9 +66,9 @@ public abstract class DanbooruCompatibleSource extends ImageSource {
             String furl = m.group(1);
             String[] tags = tg.group(1).split(" ");
             
-            EXImage img = new RemoteImage(furl, null, Arrays.stream(tags).map((x) -> Tag.getOrCreate(x)).collect(Collectors.toList()));
+            EXImage img = new RemoteImage(proto + furl, null, Arrays.stream(tags).map((x) -> Tag.getOrCreate(x)).collect(Collectors.toList()));
             imgs.add(img);
-            img.thumb = Cache.getInstance().tryFind(new RemoteImage(t.group(1)));
+            img.thumb = Cache.getInstance().tryFind(new RemoteImage(proto + t.group(1)));
         }
         
         cache = imgs.toArray(new EXImage[0]);

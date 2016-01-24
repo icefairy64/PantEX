@@ -28,15 +28,15 @@ public class Cache {
     
     public Cache() {
         cacheMap = new LinkedHashMap<>();
-        if (!cacheDir.exists()) {
-            cacheDir.mkdir();
+        if (!CACHE_DIR.exists()) {
+            CACHE_DIR.mkdir();
         }
     }
     
     public Optional<EXImage> find(EXImage proto) {
         String name = cacheMap.get(proto.id);
         return name != null && enabled
-                ? Optional.of(new FileImage(new File(cacheDir, name), proto.collection, proto.title, proto.tags)) 
+                ? Optional.of(new FileImage(new File(CACHE_DIR, name), proto.collection, proto.title, proto.tags)) 
                 : Optional.empty();
     }
     
@@ -46,7 +46,7 @@ public class Cache {
             return img.get();
         }
         else {
-            store(proto);
+            //store(proto);
             return proto;
         }
     }
@@ -54,21 +54,21 @@ public class Cache {
     public void store(EXImage img) throws IOException {
         if (cacheMap.size() >= size) {
             Long id = cacheMap.keySet().iterator().next();
-            File f = new File(cacheDir, cacheMap.get(id));
+            File f = new File(CACHE_DIR, cacheMap.get(id));
             f.delete();
             cacheMap.remove(id);
         }
         
-        OutputStream o = new FileOutputStream(new File(cacheDir, img.title));
-        img.writeImage(o);
-        o.close();
+        try (OutputStream o = new FileOutputStream(new File(CACHE_DIR, img.title))) {
+            img.writeImage(o);
+        }
         cacheMap.put(img.id, img.title);
     }
     
     // Static
     
     private static Cache instance;
-    private final static File cacheDir = new File(System.getProperty("user.dir"), "cache");
+    private final static File CACHE_DIR = new File(System.getProperty("user.dir"), "cache");
     
     public static Cache getInstance() {
         return instance == null ? instance = new Cache() : instance;

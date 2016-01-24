@@ -19,9 +19,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ImgurHelper {
     
-    private static final Logger logger = LoggerFactory.getLogger(ImgurHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImgurHelper.class);
     
-    private static final Pattern[] imagePatterns = new Pattern[] {
+    private static final Pattern[] IMAGE_PATTERNS = new Pattern[] {
         Pattern.compile("data-src=\"(.+?)\""),
         Pattern.compile("twitter:image.+?content=\"(.+?)\""),
         Pattern.compile("class=\"(?:[a-z0-9\\-\\ ]*?\\ )??image(?:\\ ?[a-z0-9\\-\\ ]*?)??\".+?(?:img|a).+?(?:src|href)=\"(.+?)\"", Pattern.DOTALL),
@@ -35,8 +35,8 @@ public class ImgurHelper {
         
         String content = Util.fetchHttpContent(url);
         int i = 0;
-        while (i < imagePatterns.length) {
-            Matcher m = imagePatterns[i++].matcher(content);
+        while (i < IMAGE_PATTERNS.length) {
+            Matcher m = IMAGE_PATTERNS[i++].matcher(content);
             while (m.find()) {
                 String match = m.group(1);
                 String filename = match.substring(match.lastIndexOf("/") + 1);
@@ -64,7 +64,7 @@ public class ImgurHelper {
         }
         
         if (list.isEmpty()) {
-            logger.warn("Warning: Imgur helper probably failed to parse page " + url);
+            LOGGER.warn("Warning: Imgur helper probably failed to parse page " + url);
         }
         
         return list;

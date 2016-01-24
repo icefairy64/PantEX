@@ -5,6 +5,8 @@
  */
 package tk.breezy64.pantex.core;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -61,13 +63,14 @@ public class ConfigManager {
     }
     
     public static void save(File file) throws IOException {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonObject json = new JsonObject();
         for (ConfigSection cs : Static.pluginManager.getExtensions(ConfigSection.class)) {
             json.add(cs.getTitle(), mapToJsonObject(cs.save()));
         }
-        Writer w = new FileWriter(file);
-        w.write(json.toString());
-        w.close();
+        try (Writer w = new FileWriter(file)) {
+            w.write(gson.toJson(json));
+        }
     }
     
     private static Map<String, Object> jsonObjectToMap(JsonObject json) {

@@ -5,7 +5,6 @@
  */
 package tk.breezy64.pantex.core;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;

@@ -17,8 +17,8 @@ import java.util.regex.Pattern;
  */
 public class HentaiFoundryImage extends EXImage implements Loadable {
     
-    private static final Pattern pathPattern = Pattern.compile("pictures.user\\/(.+?)\\/(.+?)\\/(.+)");
-    private static final Pattern imgPattern = Pattern.compile("class=\"imageTitle\".+?img.+?src=\"(.+?)\"", Pattern.DOTALL);
+    private static final Pattern PATH_PATTERN = Pattern.compile("pictures.user\\/(.+?)\\/(.+?)\\/(.+)");
+    private static final Pattern IMG_PATTERN = Pattern.compile("class=\"imageTitle\".+?img.+?src=\"(.+?)\"", Pattern.DOTALL);
 
     private final String path;
     private EXImage back;
@@ -34,7 +34,7 @@ public class HentaiFoundryImage extends EXImage implements Loadable {
             throw new RuntimeException(e);
         }
         
-        Matcher m = pathPattern.matcher(path);
+        Matcher m = PATH_PATTERN.matcher(path);
         m.find();
         this.title = m.group(3);
         
@@ -44,7 +44,7 @@ public class HentaiFoundryImage extends EXImage implements Loadable {
     public void load() throws IOException {
         if (back == null) {
             String content = Util.fetchHttpContent(path);
-            Matcher m = imgPattern.matcher(content);
+            Matcher m = IMG_PATTERN.matcher(content);
             m.find();
             back = new RemoteImage("http:" + m.group(1));
             title = back.title;

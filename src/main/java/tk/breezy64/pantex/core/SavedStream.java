@@ -16,8 +16,8 @@ import java.util.Arrays;
  */
 public class SavedStream extends InputStream {
 
-    private OutputStream out;
-    private DynamicByteArray data;
+    private final OutputStream out;
+    private final DynamicByteArray data;
     
     public SavedStream() {
         out = new Writer();

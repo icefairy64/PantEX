@@ -15,7 +15,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
@@ -27,12 +26,12 @@ import java.util.Map;
  */
 public final class Util {
     
-    private static final ByteBuffer intBuf = ByteBuffer.allocate(4);
-    private static final int bufferSize = 4096;
-    private static final Map<String, OkHttpClient> sessions = new HashMap<>();
-    private static final String defaultSession = "common";
+    private static final ByteBuffer INT_BUF = ByteBuffer.allocate(4);
+    private static final int BUFFER_SIZE = 4096;
+    private static final Map<String, OkHttpClient> SESSIONS = new HashMap<>();
+    private static final String DEFAULT_SESSION = "common";
     
-    public static final String userAgent = "Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0";
+    public static final String USER_AGENT = "Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0";
     
     public static String readStr(InputStream s, int separator) throws IOException {
         int c = s.read();
@@ -52,33 +51,33 @@ public final class Util {
     }
     
     public static int readInt(FileChannel ch) throws IOException {
-        ch.read(intBuf);
-        intBuf.rewind();
-        int res = intBuf.getInt();
-        intBuf.rewind();
+        ch.read(INT_BUF);
+        INT_BUF.rewind();
+        int res = INT_BUF.getInt();
+        INT_BUF.rewind();
         return res;
     }
     
     public static void writeInt(FileChannel ch, int value) throws IOException {
-        intBuf.putInt(value);
-        intBuf.rewind();
-        ch.write(intBuf);
-        intBuf.rewind();
+        INT_BUF.putInt(value);
+        INT_BUF.rewind();
+        ch.write(INT_BUF);
+        INT_BUF.rewind();
     }
 
     public static void copy(InputStream in, OutputStream out) throws IOException {
-        int len = 0;
-        byte[] buf = new byte[bufferSize];
+        int len;
+        byte[] buf = new byte[BUFFER_SIZE];
         while ((len = in.read(buf)) >= 0) {
             out.write(buf, 0, len);
         }
     }
     
     public static void copy(InputStream in, OutputStream out, int size) throws IOException {
-        int len = 0;
+        int len;
         int read = 0;
-        byte[] buf = new byte[bufferSize];
-        while ((len = in.read(buf, 0, Math.min(bufferSize, size - read))) >= 0 && size != read) {
+        byte[] buf = new byte[BUFFER_SIZE];
+        while ((len = in.read(buf, 0, Math.min(BUFFER_SIZE, size - read))) >= 0 && size != read) {
             out.write(buf, 0, len);
             read += len;
         }
@@ -87,7 +86,7 @@ public final class Util {
     public static String readStream(InputStream in) throws IOException {
         StringBuilder sb = new StringBuilder();
         InputStreamReader r = new InputStreamReader(in);
-        char[] buf = new char[bufferSize];
+        char[] buf = new char[BUFFER_SIZE];
         int len = 0;
         
         while ((len = r.read(buf)) >= 0) {
@@ -102,7 +101,7 @@ public final class Util {
         Request.Builder reqb = new Request.Builder()
                 .url(url)
                 .get()
-                .addHeader("User-Agent", userAgent);
+                .addHeader("User-Agent", USER_AGENT);
         for (String[] head : headers) {
             reqb.addHeader(head[0], head[1]);
         }
@@ -114,19 +113,19 @@ public final class Util {
     private static OkHttpClient getClient(String session) {
         OkHttpClient client;
         if (session == null) {
-            session = defaultSession;
+            session = DEFAULT_SESSION;
         }
         
-        if (!sessions.containsKey(session)) {
+        if (!SESSIONS.containsKey(session)) {
             OkHttpClient c = new OkHttpClient();
-            if (session.equals(defaultSession)) {
+            if (session.equals(DEFAULT_SESSION)) {
                 CookieManager cookieManager = new CookieManager();
                 cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
                 c.setCookieHandler(cookieManager);
             }
-            sessions.put(session, c);
+            SESSIONS.put(session, c);
         }
-        client = sessions.get(session);
+        client = SESSIONS.get(session);
         
         return client;
     }
@@ -136,7 +135,7 @@ public final class Util {
     }
     
     public static String post(String url, Map<String, String> params) throws IOException {
-        OkHttpClient client = getClient(defaultSession);
+        OkHttpClient client = getClient(DEFAULT_SESSION);
         FormEncodingBuilder b = new FormEncodingBuilder();
         for (Map.Entry<String, String> e : params.entrySet()) {
             b.add(e.getKey(), e.getValue());
@@ -153,14 +152,23 @@ public final class Util {
     }
     
     public static InputStream fetchHttpStream(String url, String[]... headers) throws IOException {
-        return fetchHttpStream(url, defaultSession, headers);
+        return fetchHttpStream(url, DEFAULT_SESSION, headers);
     }
 
     public static String fetchHttpContent(String url, String[]... headers) throws IOException {
-        return getHttpResponse(url, getClient(defaultSession), headers).body().string();
+        return getHttpResponse(url, getClient(DEFAULT_SESSION), headers).body().string();
     }
     
     public static String fetchHttpContent(String url, String session, String[]... headers) throws IOException {
         return getHttpResponse(url, getClient(session), headers).body().string();
     }
+    
+    public static <T> T getExtensionClass(Class<T> base, String className) {
+        return Static.pluginManager.getExtensions(base)
+                .stream()
+                .filter(x -> x.getClass().getName().equals(className))
+                .findFirst()
+                .get();
+    }
+    
 }

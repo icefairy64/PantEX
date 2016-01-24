@@ -8,7 +8,6 @@ package tk.breezy64.pantex.gui;
 import tk.breezy64.pantex.core.SimpleCollection;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.FileImage;
-import tk.breezy64.pantex.core.sources.DanbooruSource;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -131,7 +130,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void showCollections(ActionEvent event) throws IOException {
-        Util.showScene(new Scene(FXMLLoader.load(getClass().getResource("/src/main/resources/fxml/Collections.fxml"))), "Collections");
+        FXUtil.showScene(new Scene(FXMLLoader.load(getClass().getResource("/src/main/resources/fxml/Collections.fxml"))), "Collections");
     }
     
     private void onImageLoaded(Image img) {
@@ -182,6 +181,10 @@ public class MainController implements Initializable {
         List<Menu> catList = new ArrayList<>();
         
         for (ImageSourceRequester<? extends ImageSource> req : Static.pluginManager.getExtensions(ImageSourceRequester.class)) {
+            if (SourceBlacklister.blacklistedCategories != null && SourceBlacklister.blacklistedCategories.contains(req.getCategory())) {
+                continue;
+            }
+            
             MenuItem item = new MenuItem(req.getTitle());
             item.setOnAction((e) -> {
                 req.onFinish((x) -> showSourceBrowser(x)).request();
@@ -208,7 +211,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void showImageList(ActionEvent event) throws IOException {
-        Util.showScene(new Scene(FXMLLoader.load(getClass().getResource("/src/main/resources/fxml/ImagesList.fxml"))), "Image list");
+        FXUtil.showScene(new Scene(FXMLLoader.load(getClass().getResource("/src/main/resources/fxml/ImagesList.fxml"))), "Image list");
     }
     
 }

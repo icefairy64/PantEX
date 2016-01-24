@@ -65,17 +65,18 @@ public abstract class EXImage implements ExtensionPoint {
         if (thumb != null)
             return thumb;
         
-        InputStream str = getImageStream();
-        BufferedImage img = ImageIO.read(str);
-        if (img == null)
-            return null;
+        try (InputStream str = getImageStream()) {
+            BufferedImage img = ImageIO.read(str);
+            if (img == null)
+                return null;
+            
+            BufferedImage sc = Scalr.resize(img, THUMB_SIZE);
+            SavedStream buf = new SavedStream();
+            ImageIO.write(sc, THUMB_FORMAT, buf.getWriter());
+            buf.endWriting();
+            thumb = new StreamImage(buf, null, null, buf.available(), null);
+        }
         
-        BufferedImage sc = Scalr.resize(img, THUMB_SIZE);
-        SavedStream buf = new SavedStream();
-        ImageIO.write(sc, THUMB_FORMAT, buf.getWriter());
-        buf.endWriting();
-        thumb = new StreamImage(buf, null, null, buf.available(), null);
-        str.close();
         return thumb;
     }
     

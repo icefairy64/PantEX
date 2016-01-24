@@ -12,7 +12,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import javafx.application.Platform;
 import javafx.stage.DirectoryChooser;
 import ro.fortsoft.pf4j.Extension;
 import tk.breezy64.pantex.core.Collection;
@@ -43,7 +42,7 @@ public class JSONPackWrapper implements Importer, Exporter {
 
     @Override
     public Object createMinimalImportConfiguration() {
-        return null;
+        return new Object();
     }
 
     @Override
@@ -54,6 +53,16 @@ public class JSONPackWrapper implements Importer, Exporter {
             throw new RuntimeException("No directory selected");
         }
         return new JSONPackImportConfiguration(dir);
+    }
+
+    @Override
+    public Object createMinimalExportConfiguration(Collection col) {
+        return createMinimalImportConfiguration();
+    }
+
+    @Override
+    public Object createExportConfiguration(Collection col) {
+        return createImportConfiguration();
     }
 
     @Override
@@ -69,43 +78,57 @@ public class JSONPackWrapper implements Importer, Exporter {
     
     private void loadInt(Collection col, File dir) throws IOException, ImportException {
         File f = new File(dir, "collection.json");
+        File thDir = new File(dir, "thumbs");
         JSONPack.load(col, new FileReader(f), title -> {
             File x = new File(dir, title);
-            return new FileImage(x);
+            FileImage img = new FileImage(x);
+            x = new File(thDir, title);
+            img.thumb = x.exists() ? new FileImage(x) : null;
+            return img;
         }, importProgressHandler);
-        importHandler.accept(col);
+        col.title = dir.toPath().getFileName().toString();
+        col.importRecord = new CollectionImportRecord(getClass().getName(), dir.getAbsolutePath(), col.title);
+        if (importHandler != null) {
+            importHandler.accept(col);
+        }
+    }
+
+    private void export(Collection col, File dir) throws IOException, ExportException {
+        if (dir == null) {
+            throw new ExportException("No directory selected");
+        }
+
+        File thDir = new File(dir, "thumbs");
+        thDir.mkdir();
+
+        File f = new File(dir, "collection.json");
+        JSONPack.write(col, new FileWriter(f), img -> {
+            try {
+                File x = new File(dir, img.title);
+                if (!x.exists()) {
+                    img.writeImage(new FileOutputStream(x));
+                }
+                x = new File(thDir, img.title);
+                if (!x.exists()) {
+                    img.getThumb().writeImage(new FileOutputStream(x));
+                }
+            } catch (Exception e) {
+                FXStatic.handleException(e);
+            }
+        }, exportProgressHandler);
+        if (exportHandler != null) {
+            exportHandler.accept(col);
+        }
+    }
+    
+    @Override
+    public void export(Collection col, Object conf) throws IOException, ExportException {
+        export(col, ((JSONPackImportConfiguration) conf).directory);
     }
 
     @Override
-    public void export(Collection col) throws IOException, ExportException {
-        Platform.runLater(() -> {
-            DirectoryChooser ch = new DirectoryChooser();
-            File dir = ch.showDialog(null);
-            if (dir == null) {
-                throw new RuntimeException("No directory selected");
-            }
-            
-            File f = new File(dir, "collection.json");
-            FXStatic.executor.submit(() -> {
-                try {
-                    JSONPack.write(col, new FileWriter(f), img -> {
-                        try {
-                            File x = new File(dir, img.title);
-                            if (!x.exists()) {
-                                img.writeImage(new FileOutputStream(x));
-                            }
-                        }
-                        catch (Exception e) {
-                            FXStatic.handleException(e);
-                        }
-                    }, exportProgressHandler);
-                }
-                catch (Exception e) {
-                    FXStatic.handleException(e);
-                }
-                exportHandler.accept(col);
-            });
-        });
+    public void export(Collection col, CollectionImportRecord rec, Object conf) throws IOException, ExportException {
+        export(col, new File(rec.collectionDescriptor));
     }
 
     @Override

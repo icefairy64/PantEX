@@ -53,11 +53,9 @@ public class RemoteImage extends EXImage {
             File file = File.createTempFile("PantEX", ext);
             file.deleteOnExit();
 
-            InputStream in = Util.fetchHttpStream(url, headers.toArray(new String[0][0]));
-            FileOutputStream out = new FileOutputStream(file);
-            Util.copy(in, out);
-            out.close();
-            in.close();
+            try (InputStream in = Util.fetchHttpStream(url, headers.toArray(new String[0][0])); FileOutputStream out = new FileOutputStream(file)) {
+                Util.copy(in, out);
+            }
 
             local = new FileImage(file, collection, title, tags);
         } catch (Exception e) {

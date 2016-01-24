@@ -46,21 +46,28 @@ public class EXPackWrapper implements Importer, Exporter {
 
     @Override
     public Object createMinimalImportConfiguration() {
-        return null;
+        return new Object();
+    }
+
+    @Override
+    public Object createExportConfiguration(Collection col) {
+        FileChooser ch = new FileChooser();
+        File f = ch.showSaveDialog(null);
+        return new EXPackImportConfiguration(f);
+    }
+
+    @Override
+    public Object createMinimalExportConfiguration(Collection col) {
+        return createMinimalImportConfiguration();
     }
 
     @Override
     public void load(Collection col, Object conf) throws IOException, ImportException {
         EXPackImportConfiguration c = (EXPackImportConfiguration)conf;
-        
         if (c.file != null) {
-            try {
-                EXPack.getInstance().load(c.file, col, importProgressHandler);
-                if (importHandler != null) {
-                    importHandler.accept(col);
-                }
-            } catch (Exception e) {
-                FXStatic.handleException(e);
+            EXPack.getInstance().load(c.file, col, importProgressHandler);
+            if (importHandler != null) {
+                importHandler.accept(col);
             }
         }
     }
@@ -68,36 +75,30 @@ public class EXPackWrapper implements Importer, Exporter {
     @Override
     public void load(Collection col, CollectionImportRecord ir, Object conf) throws IOException, ImportException {
         File f = new File(ir.collectionDescriptor);
-        try {
-            EXPack.getInstance().load(f, col, importProgressHandler);
-            if (importHandler != null) {
-                importHandler.accept(col);
-            }
-
-        } catch (Exception e) {
-            FXStatic.handleException(e);
+        EXPack.getInstance().load(f, col, importProgressHandler);
+        if (importHandler != null) {
+            importHandler.accept(col);
         }
     }
 
     @Override
-    public void export(Collection col) throws IOException, ExportException {
-        FileChooser ch = new FileChooser();
-        Platform.runLater(() -> {
-            File f = ch.showSaveDialog(null);
-            FXStatic.executor.submit(() -> {
-                if (f != null) {
-                    try {
-                        EXPack.getInstance().write(col, f, exportProgressHandler);
-                        if (exportHandler != null) {
-                            exportHandler.accept(col);
-                        }
-                    }
-                    catch (Exception e) {
-                        FXStatic.handleException(e);
-                    }
-                }
-            });
-        });
+    public void export(Collection col, Object conf) throws IOException, ExportException {
+        File f = ((EXPackImportConfiguration)conf).file;
+        if (f != null) {
+            EXPack.getInstance().write(col, f, exportProgressHandler);
+            if (exportHandler != null) {
+                exportHandler.accept(col);
+            }
+        }
+    }
+
+    @Override
+    public void export(Collection col, CollectionImportRecord rec, Object conf) throws IOException, ExportException {
+        File f = new File(rec.collectionDescriptor);
+        EXPack.getInstance().write(col, f, exportProgressHandler);
+        if (exportHandler != null) {
+            exportHandler.accept(col);
+        }
     }
     
     @Override

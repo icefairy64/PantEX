@@ -37,6 +37,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tk.breezy64.pantex.core.Collection;
 import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.Exporter;
 import tk.breezy64.pantex.core.Importer;
@@ -102,6 +103,7 @@ public class CollectionsController implements Initializable {
             imageCountLabel.setText(String.format("Images: %d", nV.images.size()));
             scrollPane.setVvalue(scrollPane.getVmax());
             imagesGrid.getChildren().clear();
+            containerManager.reset();
         });
         
         /*imagesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -211,21 +213,24 @@ public class CollectionsController implements Initializable {
     
     private MenuItem createExportItem(Exporter x) {
         MenuItem item = new MenuItem(x.getTitle());
-            item.setOnAction((ev) -> {
+        item.setOnAction((ev) -> {
+            Collection col = collectionsList.getSelectionModel().getSelectedItem();
+            Object conf = x.createExportConfiguration(col);
+            if (conf != null) {
                 indicateProgressStart();
-                FXStatic.executor.submit(() -> { 
-                    try { 
+                FXStatic.executor.submit(() -> {
+                    try {
                         x.afterExport((z) -> Platform.runLater(() -> indicateProgressEnd()))
-                                .onExportProgress((c, t) -> Platform.runLater(() -> progressIndicator.setProgress((double)c / t)))
-                                .export(collectionsList.getSelectionModel().getSelectedItem()); 
-                    } 
-                    catch (Exception e) { 
-                        FXStatic.handleException(e); 
-                    } 
+                                .onExportProgress((c, t) -> Platform.runLater(() -> progressIndicator.setProgress((double) c / t)))
+                                .export(col, conf);
+                    } catch (Throwable e) {
+                        FXStatic.handleException(e);
+                    }
                 });
-                ev.consume();
-            });
-            return item;
+            }
+            ev.consume();
+        });
+        return item;
     }
 
     private void exportClick(ActionEvent event) {

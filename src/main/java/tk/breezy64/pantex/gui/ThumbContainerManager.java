@@ -59,4 +59,8 @@ public class ThumbContainerManager {
         pane.getChildren().add(img);
     }
     
+    public void reset() {
+        currentRow.clear();
+    }
+    
 }

@@ -23,6 +23,7 @@ public class LusciousSource extends ImageSource {
     
     private static final String root = "http://luscious.net";
     private static final String simpleURL = "http://luscious.net/c/%s/pictures/page/%d/?style=thumbnails";
+    private static final String albumUrl = "http://luscious.net/c/%s/pictures/album/%s/page/%d/?style=thumbnails";
     
     private final String url;
     
@@ -30,6 +31,10 @@ public class LusciousSource extends ImageSource {
     
     public LusciousSource(String category) {
         url = simpleURL.replaceFirst("%s", category);
+    }
+    
+    public LusciousSource(String category, String album) {
+        url = albumUrl.replaceFirst("%s", category).replaceFirst("%s", album);
     }
     
     @Override
