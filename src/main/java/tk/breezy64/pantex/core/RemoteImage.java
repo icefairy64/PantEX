@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author icefairy64
  */
-public class RemoteImage extends EXImage {
+public class RemoteImage extends EXImage implements Loadable {
 
     protected String url;
     protected FileImage local;
@@ -47,7 +47,8 @@ public class RemoteImage extends EXImage {
         headers.add(new String[] { header, value });
     }
     
-    private void load() {
+    @Override
+    public void load() {
         try {
             String ext = url.substring(url.lastIndexOf("."), url.length());
             File file = File.createTempFile("PantEX", ext);

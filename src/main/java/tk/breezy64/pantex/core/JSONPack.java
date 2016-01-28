@@ -85,6 +85,7 @@ public class JSONPack {
         }
         
         writer.write(root.toString());
+        writer.flush();
         writer.close();
     }
     

@@ -114,9 +114,10 @@ public class AutoImporter extends ConfigSection {
             };
             
             tasks.add(tk);
+            FXTask.schedule(tk);
         }
         
-        for (int i = 0; i < tasks.size() - 1; i++) {
+        /*for (int i = 0; i < tasks.size() - 1; i++) {
             Task<Collection> tk = tasks.get(i);
             Task<Collection> next = tasks.get(i + 1);
             tk.setOnSucceeded(x -> { FXTask.run(next); x.consume(); });
@@ -127,7 +128,8 @@ public class AutoImporter extends ConfigSection {
         if (!tasks.isEmpty()) {
             FXTask.run(tasks.get(0));
         }
-        else {
+        else*/
+        if (tasks.isEmpty()) {
             FXCollection.createAndAdd("Temp");
         }
     }

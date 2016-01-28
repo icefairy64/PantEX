@@ -184,7 +184,7 @@ public class SourceBrowserController implements Initializable {
             
         };
         
-        FXTask.run(task);
+        FXTask.schedule(task);
     }
     
     private void fetch() {

@@ -17,6 +17,7 @@
               <MenuItem fx:id="addImagesButton" mnemonicParsing="false" onAction="#addImages" text="Add images..." />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#showImageList" text="Show image list" />
+                  <MenuItem mnemonicParsing="false" onAction="#showTaskList" text="Show task list" />
                   <MenuItem fx:id="collectionsButton" mnemonicParsing="false" onAction="#showCollections" text="Collections..." />
             </items>
           </Menu>

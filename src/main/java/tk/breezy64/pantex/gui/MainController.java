@@ -214,4 +214,9 @@ public class MainController implements Initializable {
         FXUtil.showScene(new Scene(FXMLLoader.load(getClass().getResource("/src/main/resources/fxml/ImagesList.fxml"))), "Image list");
     }
     
+    @FXML
+    private void showTaskList(ActionEvent event) throws IOException {
+        FXUtil.showScene(new Scene(FXMLLoader.load(getClass().getResource("/src/main/resources/fxml/TaskManager.fxml"))), "Task list");
+    }
+    
 }

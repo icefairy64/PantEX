@@ -42,6 +42,7 @@ import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.Exporter;
 import tk.breezy64.pantex.core.Importer;
 import tk.breezy64.pantex.core.Static;
+import tk.breezy64.pantex.core.Util;
 
 /**
  * FXML Controller class
@@ -105,15 +106,6 @@ public class CollectionsController implements Initializable {
             imagesGrid.getChildren().clear();
             containerManager.reset();
         });
-        
-        /*imagesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        imagesList.itemsProperty().bind(Bindings.createObjectBinding(() ->
-                collectionsList.getSelectionModel().getSelectedItem() == null ?
-                    new ObservableListWrapper<>(new ArrayList<>()) :
-                    new ObservableListWrapper<>(collectionsList.getSelectionModel().getSelectedItem().images.values().stream().collect(Collectors.toList())),
-                collectionsList.getSelectionModel().selectedItemProperty(), collectionsList.getSelectionModel().getSelectedItem().images, FXStatic.images));
-        imagesList.getSelectionModel().selectedItemProperty().addListener((ChangeListener<FXImage>)(x, oV, nV) -> 
-                FXStatic.currentImage.set(nV));*/
         
         imagesGrid.prefWidthProperty().bind(scrollPane.widthProperty());
         
@@ -204,7 +196,15 @@ public class CollectionsController implements Initializable {
         MenuItem item = new MenuItem(x.getTitle());
             item.setOnAction((ev) -> {
                 Object conf = x.createImportConfiguration();
-                FXStatic.executor.submit(() -> load(x, conf));
+                ImportTask t = new ImportTask(x, conf);
+                progressIndicator.progressProperty().bind(t.progressProperty());
+                t.setOnSucceeded((z) -> {
+                    progressIndicator.progressProperty().unbind();
+                    indicateProgressEnd();
+                    FXCollection.dictionary.put(t.getValue().index, t.getValue());
+                    z.consume();
+                });
+                FXTask.schedule(t);
                 indicateProgressStart();
                 ev.consume();
             });
@@ -217,37 +217,19 @@ public class CollectionsController implements Initializable {
             Collection col = collectionsList.getSelectionModel().getSelectedItem();
             Object conf = x.createExportConfiguration(col);
             if (conf != null) {
-                indicateProgressStart();
-                FXStatic.executor.submit(() -> {
-                    try {
-                        x.afterExport((z) -> Platform.runLater(() -> indicateProgressEnd()))
-                                .onExportProgress((c, t) -> Platform.runLater(() -> progressIndicator.setProgress((double) c / t)))
-                                .export(col, conf);
-                    } catch (Throwable e) {
-                        FXStatic.handleException(e);
-                    }
+                ExportTask t = new ExportTask(x, conf, col);
+                progressIndicator.progressProperty().bind(t.progressProperty());
+                t.setOnSucceeded((z) -> {
+                    progressIndicator.progressProperty().unbind();
+                    indicateProgressEnd();
+                    z.consume();
                 });
+                FXTask.schedule(t);
+                indicateProgressStart();
             }
             ev.consume();
         });
         return item;
-    }
-
-    private void exportClick(ActionEvent event) {
-        event.consume();
-        FileChooser ch = new FileChooser();
-        File f = ch.showSaveDialog(exportButton.getScene().getWindow());
-        
-        indicateProgressStart();
-        FXStatic.executor.submit(() -> { 
-            try { 
-                EXPack.writeCollection(collectionsList.getSelectionModel().getSelectedItem(), f); 
-            } 
-            catch (Exception e) { 
-                throw new RuntimeException(e); 
-            } 
-            Platform.runLater(() -> indicateProgressEnd()); 
-        });
     }
 
     @FXML
@@ -269,28 +251,12 @@ public class CollectionsController implements Initializable {
     }
     
     private void indicateProgressStart() {
-        progressIndicator.setProgress(0.0);
+        //progressIndicator.setProgress(0.0);
         progressIndicator.setVisible(true);
     }
     
     private void indicateProgressEnd() {
         progressIndicator.setVisible(false);
-    }
-    
-    private void load(Importer imp, Object conf) {
-        try {
-            FXCollection col = FXCollection.create("");
-            imp.afterImport((x) -> Platform.runLater(() -> {
-                        FXCollection.dictionary.put(col.index, col);
-                        logger.info(x.importRecord.toString().replace("\n", "\\n"));
-                        indicateProgressEnd();
-                    }))
-                    .onImportProgress((c, t) -> Platform.runLater(() -> progressIndicator.setProgress((double)c / t)))
-                    .load(col, conf);
-        }
-        catch (Exception e) {
-            FXStatic.handleException(e);
-        }
     }
 
     @FXML
@@ -326,6 +292,8 @@ public class CollectionsController implements Initializable {
         ChoiceDialog<FXCollection> dialog = new ChoiceDialog<>(FXCollection.defaultCollection, FXCollection.dictionary.values());
         dialog.setHeaderText("Choose a collection");
         dialog.setContentText("Collection:");
+        dialog.getDialogPane().getScene().getStylesheets().add(getClass().getResource("/src/main/resources/css/default.css").toString());
+        dialog.getDialogPane().getStyleClass().add("dialog-pane");
         
         Optional<FXCollection> col = dialog.showAndWait();
         col.ifPresent((x) -> {

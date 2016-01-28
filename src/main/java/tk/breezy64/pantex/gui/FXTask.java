@@ -23,18 +23,29 @@ public class FXTask {
     private static final Logger logger = LoggerFactory.getLogger(FXTask.class);
     
     public final static ObservableList<Task<?>> list = new ObservableListWrapper<>(new ArrayList<Task<?>>());
-     
-    public static void run(Task<?> task) {
+    
+    private static boolean running;
+    
+    private static void run(Task<?> task) {
+        running = true;
+        FXStatic.executor.submit(task);
+    }
+    
+    public static void schedule(Task<?> task) {
         final EventHandler<WorkerStateEvent> prev = task.getOnSucceeded();
         task.onSucceededProperty().set(e -> {
+            running = false;
             if (prev != null) {
                 prev.handle(e);
             }
             else {
                 e.consume();
             }
-            list.remove(task);
+            list.removeAll(task);
             logger.info("Task finished: " + task.getTitle());
+            if (!list.isEmpty()) {
+                run(list.get(0));
+            }
         });
         
         final EventHandler<WorkerStateEvent> prez = task.getOnRunning();
@@ -47,8 +58,17 @@ public class FXTask {
             }
             logger.info("Running task: " + task.getTitle());
         });
-        list.add(task);
-        FXStatic.executor.submit(task);
+        
+        if (!list.contains(task)) {
+            list.add(task);
+        }
+        
+        if (!running) {
+            run(task);
+        }
+        else {
+            logger.info("Scheduling another task");
+        }
     }
     
     public static void stop(Task<?> task) {

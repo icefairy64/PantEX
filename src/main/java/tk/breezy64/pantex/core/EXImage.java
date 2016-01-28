@@ -68,13 +68,14 @@ public abstract class EXImage implements ExtensionPoint {
         try (InputStream str = getImageStream()) {
             BufferedImage img = ImageIO.read(str);
             if (img == null)
-                return null;
+                throw new RuntimeException("Failed to read image from stream while generating thumbnail");
             
             BufferedImage sc = Scalr.resize(img, THUMB_SIZE);
             SavedStream buf = new SavedStream();
             ImageIO.write(sc, THUMB_FORMAT, buf.getWriter());
             buf.endWriting();
             thumb = new StreamImage(buf, null, null, buf.available(), null);
+            thumb.title = title.replace(title.substring(title.lastIndexOf('.')  + 1), THUMB_FORMAT.toLowerCase());
         }
         
         return thumb;

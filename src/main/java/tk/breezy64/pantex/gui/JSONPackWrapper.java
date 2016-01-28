@@ -16,6 +16,7 @@ import javafx.stage.DirectoryChooser;
 import ro.fortsoft.pf4j.Extension;
 import tk.breezy64.pantex.core.Collection;
 import tk.breezy64.pantex.core.CollectionImportRecord;
+import tk.breezy64.pantex.core.EXImage;
 import tk.breezy64.pantex.core.ExportException;
 import tk.breezy64.pantex.core.Exporter;
 import tk.breezy64.pantex.core.FileImage;
@@ -84,6 +85,12 @@ public class JSONPackWrapper implements Importer, Exporter {
             FileImage img = new FileImage(x);
             x = new File(thDir, title);
             img.thumb = x.exists() ? new FileImage(x) : null;
+            if (img.thumb == null) {
+                x = new File(thDir, title.replace(title.substring(title.lastIndexOf('.') + 1), EXImage.THUMB_FORMAT.toLowerCase()));
+                if (x.exists()) {
+                    img.thumb = new FileImage(x);
+                }
+            }
             return img;
         }, importProgressHandler);
         col.title = dir.toPath().getFileName().toString();
@@ -108,8 +115,9 @@ public class JSONPackWrapper implements Importer, Exporter {
                 if (!x.exists()) {
                     img.writeImage(new FileOutputStream(x));
                 }
-                x = new File(thDir, img.title);
-                if (!x.exists()) {
+                String tn = img.getThumb().title;
+                x = new File(thDir, tn);
+                if (!x.exists() && !new File(thDir, img.title).exists()) {
                     img.getThumb().writeImage(new FileOutputStream(x));
                 }
             } catch (Exception e) {
