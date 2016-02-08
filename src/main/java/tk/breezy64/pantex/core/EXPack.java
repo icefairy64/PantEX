@@ -97,11 +97,12 @@ public class EXPack {
             offset += imgSizes[i];
         }
         
-        EXImage[] imgs = res.getImages();
-        for (int i = 0; i < imgCount; i++) {
+        java.util.Collection<? extends EXImage> imgs = res.getImages();
+        int i = 0;
+        for (EXImage z : imgs) {
             if (thumbSizes[i] > 0)
-                imgs[i].thumb = new StreamImage(new ImageStream(ch, offset, thumbSizes[i]), null, null, thumbSizes[i], null);
-            offset += thumbSizes[i];
+                z.thumb = new StreamImage(new ImageStream(ch, offset, thumbSizes[i]), null, null, thumbSizes[i], null);
+            offset += thumbSizes[i++];
         }
     }
     
@@ -112,7 +113,7 @@ public class EXPack {
         out.write(SIGNATURE);
         Util.writeStr(out, col.title, SEPARATOR);
         
-        java.util.Collection<EXImage> imgs = Arrays.stream(col.getImages()).collect(Collectors.toList());
+        java.util.Collection<? extends EXImage> imgs = col.getImages();
         List<Tag> tags = Tag.idMap.values().stream().filter((t) -> imgs.stream().anyMatch((i) -> i.tags.contains(t))).collect(Collectors.toList());
         Map<Tag, Integer> mtags = new HashMap<>();
         for (int i = 0; i < tags.size(); i++) {

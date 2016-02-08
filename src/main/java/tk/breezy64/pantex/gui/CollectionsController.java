@@ -53,7 +53,7 @@ public class CollectionsController implements Initializable {
     
     private static final Logger logger = LoggerFactory.getLogger(CollectionsController.class);
     private static final int LOAD_THRESHOLD = 300;
-    private static final int LOAD_SIZE = 12;
+    private static final int LOAD_SIZE = 40;
     
     private ThumbContainerManager containerManager;
     private boolean adding = false;
@@ -75,6 +75,7 @@ public class CollectionsController implements Initializable {
     private Label imageCountLabel;
     
     private List<ThumbBox> selection;
+    private EXImage[] images;
 
     /**
      * Initializes the controller class.
@@ -105,6 +106,8 @@ public class CollectionsController implements Initializable {
             scrollPane.setVvalue(scrollPane.getVmax());
             imagesGrid.getChildren().clear();
             containerManager.reset();
+            images = nV.getImagesReverse().stream().collect(Collectors.toList()).toArray(new EXImage[0]);
+            scrollPane.setVvalue(-0.01);
         });
         
         imagesGrid.prefWidthProperty().bind(scrollPane.widthProperty());
@@ -112,7 +115,9 @@ public class CollectionsController implements Initializable {
         scrollPane.vvalueProperty().addListener((ChangeListener<Number>)(x, oV, nV) -> {
             FXCollection col = collectionsList.getSelectionModel().getSelectedItem();
             if (!adding && col != null && nV.doubleValue() >= scrollPane.getVmax() - (LOAD_THRESHOLD / imagesGrid.getHeight())) {
-                addWhileVisible(col.getImagesReverse(), pos);
+                if (images != null) {
+                    addWhileVisible(images, pos);
+                }
             }
         });
         
@@ -185,7 +190,10 @@ public class CollectionsController implements Initializable {
                 e.consume();
             });
 
-            Platform.runLater(() -> containerManager.add(box));
+            Platform.runLater(() -> {
+                containerManager.add(box);
+                containerManager.pane.requestLayout();
+            });
         }
         catch (IOException e) {
             FXStatic.handleException(e);
@@ -194,11 +202,11 @@ public class CollectionsController implements Initializable {
     
     private MenuItem createImportItem(Importer x) {
         MenuItem item = new MenuItem(x.getTitle());
-            item.setOnAction((ev) -> {
+            item.setOnAction(ev -> {
                 Object conf = x.createImportConfiguration();
                 ImportTask t = new ImportTask(x, conf);
                 progressIndicator.progressProperty().bind(t.progressProperty());
-                t.setOnSucceeded((z) -> {
+                t.setOnSucceeded(z -> {
                     progressIndicator.progressProperty().unbind();
                     indicateProgressEnd();
                     FXCollection.dictionary.put(t.getValue().index, t.getValue());
@@ -213,13 +221,16 @@ public class CollectionsController implements Initializable {
     
     private MenuItem createExportItem(Exporter x) {
         MenuItem item = new MenuItem(x.getTitle());
-        item.setOnAction((ev) -> {
+        item.setOnAction(ev -> {
             Collection col = collectionsList.getSelectionModel().getSelectedItem();
             Object conf = x.createExportConfiguration(col);
             if (conf != null) {
                 ExportTask t = new ExportTask(x, conf, col);
-                progressIndicator.progressProperty().bind(t.progressProperty());
-                t.setOnSucceeded((z) -> {
+                t.setOnScheduled(z -> {
+                    progressIndicator.progressProperty().bind(t.progressProperty());
+                    z.consume();
+                });
+                t.setOnSucceeded(z -> {
                     progressIndicator.progressProperty().unbind();
                     indicateProgressEnd();
                     z.consume();
@@ -251,7 +262,6 @@ public class CollectionsController implements Initializable {
     }
     
     private void indicateProgressStart() {
-        //progressIndicator.setProgress(0.0);
         progressIndicator.setVisible(true);
     }
     
@@ -266,7 +276,7 @@ public class CollectionsController implements Initializable {
         d.getDialogPane().getScene().getStylesheets().add(getClass().getResource("/src/main/resources/css/default.css").toString());
         d.getDialogPane().getStyleClass().add("dialog-pane");
         d.setContentText("Enter new collection name:");
-        d.showAndWait().ifPresent((x) -> FXCollection.createAndAdd(x));
+        d.showAndWait().ifPresent(x -> FXCollection.createAndAdd(x));
     }
 
     @FXML
@@ -296,7 +306,7 @@ public class CollectionsController implements Initializable {
         dialog.getDialogPane().getStyleClass().add("dialog-pane");
         
         Optional<FXCollection> col = dialog.showAndWait();
-        col.ifPresent((x) -> {
+        col.ifPresent(x -> {
             List<FXImage> l = new ArrayList<>(selection.stream().map(z -> z.getImage()).collect(Collectors.toList()));
             l.forEach((img) -> {
                 img.getEXImage().collection.moveImage(img.getEXImage(), x);
@@ -316,11 +326,11 @@ public class CollectionsController implements Initializable {
             indicateProgressStart();
             final AtomicInteger i = new AtomicInteger();
             FXStatic.executor.submit(() -> {
-                selection.stream().forEach((img) -> {
+                selection.stream().forEach(img -> {
                     try {
-                        FileOutputStream s = new FileOutputStream(new File(dir, img.getImage().getEXImage().title));
-                        img.getImage().getEXImage().writeImage(s);
-                        s.close();
+                        try (FileOutputStream s = new FileOutputStream(new File(dir, img.getImage().getEXImage().title))) {
+                            img.getImage().getEXImage().writeImage(s);
+                        }
                         Platform.runLater(() -> progressIndicator.setProgress(i.incrementAndGet() / (double)selection.size()));
                     }
                     catch (Exception e) {

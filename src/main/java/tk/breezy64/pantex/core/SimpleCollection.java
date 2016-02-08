@@ -45,15 +45,15 @@ public class SimpleCollection extends Collection {
     }
 
     @Override
-    public EXImage[] getImages() {
-        return images.values().toArray(new EXImage[0]);
+    public java.util.Collection<? extends EXImage> getImages() {
+        return images.values();
     }
     
     @Override
-    public EXImage[] getImagesReverse() {
+    public java.util.Collection<? extends EXImage> getImagesReverse() {
         List<EXImage> imgs = new ArrayList<>(images.values());
         Collections.reverse(imgs);
-        return imgs.toArray(new EXImage[0]);
+        return imgs;
     }
 
     @Override

@@ -24,6 +24,7 @@ public class ExportTask extends Task<Void> {
         this.descriptor = descriptor;
         this.exporter = exporter;
         this.col = col;
+        updateTitle("Exporting collection " + col.title);
     }
     
     @Override
@@ -36,7 +37,6 @@ public class ExportTask extends Task<Void> {
     @Override
     protected void scheduled() {
         super.scheduled();
-        updateTitle("Exporting collection " + col.title);
     }
     
 }

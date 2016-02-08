@@ -5,6 +5,8 @@
  */
 package tk.breezy64.pantex.core;
 
+import java.util.List;
+
 /**
  *
  * @author icefairy64
@@ -37,8 +39,8 @@ public abstract class Collection {
         return title;
     }
     
-    public abstract EXImage[] getImages();
-    public abstract EXImage[] getImagesReverse();
+    public abstract java.util.Collection<? extends EXImage> getImages();
+    public abstract java.util.Collection<? extends EXImage> getImagesReverse();
     public abstract void addImage(EXImage img);
     public abstract void removeImage(EXImage img);
     

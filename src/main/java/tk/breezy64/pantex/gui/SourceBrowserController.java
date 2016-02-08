@@ -256,6 +256,7 @@ public class SourceBrowserController implements Initializable {
             Platform.runLater(() -> { 
                 //flowPane.getChildren().add(box);
                 containerManager.add(box);
+                containerManager.pane.requestLayout();
                 imageList.add(box);
             });
         }

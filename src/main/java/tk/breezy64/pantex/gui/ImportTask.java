@@ -21,6 +21,7 @@ public class ImportTask extends Task<FXCollection> {
         super();
         this.descriptor = descriptor;
         this.importer = importer;
+        updateTitle("Importing collection");
     }
     
     @Override
@@ -34,7 +35,6 @@ public class ImportTask extends Task<FXCollection> {
     @Override
     protected void scheduled() {
         super.scheduled();
-        updateTitle("Importing collection");
     }
     
 }

@@ -55,7 +55,7 @@ public class JSONPack {
         root.add("tags", tagsArray);
         
         List<Tag> tags = new ArrayList<>();
-        EXImage[] imgs = col.getImages();
+        java.util.Collection<? extends EXImage> imgs = col.getImages();
         
         int i = 0;
         for (EXImage img : imgs) {
@@ -80,7 +80,7 @@ public class JSONPack {
             saver.accept(img);
 
             if (progressHandler != null) {
-                progressHandler.accept(++i, imgs.length);
+                progressHandler.accept(++i, imgs.size());
             }
         }
         

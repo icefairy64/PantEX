@@ -43,7 +43,7 @@ public class FXCollection extends Collection {
         FXImage target = null;
         
         for (FXImage i : images.values()) {
-            if (i.getEXImage() == img) {
+            if (i.getEXImage().equals(img)) {
                 target = i;
                 break;
             }
@@ -53,20 +53,20 @@ public class FXCollection extends Collection {
     }
     
     @Override
-    public EXImage[] getImages() {
-        return images.values().stream().map((x) -> x.getEXImage()).collect(Collectors.toList()).toArray(new EXImage[0]);
+    public java.util.Collection<? extends EXImage> getImages() {
+        return images.values().stream().map(x -> x.getEXImage()).collect(Collectors.toList());
     }
     
     @Override
-    public EXImage[] getImagesReverse() {
-        List<EXImage> imgs = images.values().stream().map((x) -> x.getEXImage()).collect(Collectors.toList());
+    public java.util.Collection<? extends EXImage> getImagesReverse() {
+        List<EXImage> imgs = images.values().stream().map(x -> x.getEXImage()).collect(Collectors.toList());
         Collections.reverse(imgs);
-        return imgs.toArray(new EXImage[0]);
+        return imgs;
     }
     
     public static ObservableMap<Integer, FXCollection> initDictionary() {
         ObservableMap<Integer, FXCollection> res = new ObservableMapWrapper<>(new LinkedHashMap<>());
-        res.addListener((MapChangeListener<Integer, FXCollection>)(x) -> { 
+        res.addListener((MapChangeListener<Integer, FXCollection>)x -> { 
                 //if (x.getValueRemoved() != null)    
                 //    FXStatic.rebuildImageList();
             
